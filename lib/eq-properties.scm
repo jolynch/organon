@@ -89,6 +89,12 @@
 	 (hash-table/get eq-properties node #f)))
     (if plist (cons node plist) #f)))
 
+(define (eq-plist-simple node) 
+  (hash-table/get eq-properties node #f))
+
+(define (eq-ordered-plist node)
+  (sort (map symbol->string (map first (eq-plist-simple node))) string<?))
+
 (define (eq-clone! source target)
   (hash-table/put! eq-properties target
     (hash-table/get eq-properties source '()))
