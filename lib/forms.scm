@@ -63,16 +63,16 @@
 (define (make-quaternion q1 q2 q3 q4) (list q1 q2 q3 q4))
 (define (make-frame vector quaternion) (list vector quaternion))
 
-(declare-form 'thing1 '3D-form)
-(make-form 'thing1 '3D-form
-            (list (make-frame (make-vector 0 0 0) (make-quaternion 0 0 0 0))
-                  (make-vertex 0 0 0)))
-
-(declare-form 'lhand '3D-hand-form)
-
-(pp-form 'thing1)
-(pp-form 'lhand)
-
+;; (declare-form 'thing1 '3D-form)
+;; (make-form 'thing1 '3D-form
+;;             (list (make-frame (make-vector 0 0 0) (make-quaternion 0 0 0 0))
+;;                   (make-vertex 0 0 0)))
+;; 
+;; (declare-form 'lhand '3D-hand-form)
+;; 
+;; (pp-form 'thing1)
+;; (pp-form 'lhand)
+;; 
 ;; (make-3d-form 'thing1)
 ;; (make-3d-form 'thing2)
 ;; (make-3d-hand-form 'lhand)
