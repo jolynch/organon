@@ -6,6 +6,13 @@
 ;; Mapping of constrains to dependent constraints
 (define *constraints* (make-eq-hash-table))
 
+(define (update-form form)
+  (let ((constraints (eq-get *forms* form)))
+    (if constraints
+      (for-each (lambda (constraint)
+                  (constraint))
+                constraints))))
+
 (define (show-form-mapping)
   (pp (cdr (eq-plist *forms*))))
 
@@ -24,7 +31,7 @@
   (define me
     (make-entity
       (lambda (self . args)
-        (pp (eq-get *constraints* self))
+        (pp "Evaluating basic constraint")
         (cond ((null? args) (apply func forms))
               (else (apply func args))))
       'no-extra))

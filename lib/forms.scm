@@ -1,6 +1,13 @@
-(define (has-property form property)
-  (not (equal? (memq property (map first (eq-plist-simple form))) #f))
-)
+(define (has-property? form property)
+  (if (get-property form property) #t #f))
+
+(define (get-property form property)
+  (eq-get form property))
+
+(define (set-property form property value)
+  (eq-put! form property value)
+  (update-form form))
+
 
 (define (same-type? form-a form-b)
   (equal? (eq-ordered-plist form-a) (eq-ordered-plist form-b))
@@ -76,7 +83,7 @@
 ;; (make-3d-form 'thing1)
 ;; (make-3d-form 'thing2)
 ;; (make-3d-hand-form 'lhand)
-;; (pp (has-property 'thing1 'frame))
-;; (pp (has-property 'thing1 'frame))
+;; (pp (has-property? 'thing1 'frame))
+;; (pp (has-property? 'thing1 'frame))
 ;; (pp (same-type? 'thing1 'thing2))
 ;; (pp (same-type? 'lhand 'thing2))
