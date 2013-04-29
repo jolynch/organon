@@ -31,10 +31,19 @@
   (define me
     (make-entity
       (lambda (self . args)
-        (pp "Evaluating basic constraint")
-        (cond ((null? args) (apply func forms))
-              (else (apply func args))))
-      'no-extra))
+        (cond
+          ((eq? (car (entity-extra self)) 'dirty)
+           (pp "Evaluating basic constraint")
+           (let ((value
+                   (if (null? args)
+                     (apply func forms)
+                     (apply func args))))
+             (set-entity-extra! self (cons 'clean value))
+             value))
+          (else
+            (display "Using cached value")
+            (cdr (entity-extra self)))))
+      '(dirty)))
   (for-each (lambda (form) (register-form me form)) forms)
   me)
 
@@ -42,14 +51,18 @@
   (define me
     (make-entity
       (lambda (self . args)
-        (pp "woot")
-        (cond ((null? args) (apply func constraints))
-              (else (apply func args)))
-        (pp "Propagating to higher level constraints")
-        (pp (eq-get *constraints* self))
-        (if (list? (eq-get *constraints* self))
-        (for-each (lambda (constraint) (constraint)) (eq-get *constraints* self))))
-      'no-extra))
+        (cond
+          ((eq? (car (entity-extra self)) 'dirty)
+           (let ((value
+                   (if (null? args)
+                     (apply func constraints)
+                     (apply func args))))
+             (set-entity-extra! self (cons 'clean value))
+             value))
+          (else
+            (display "Using cached value")
+            (cdr (entity-extra self)))))
+      '(dirty)))
   (for-each (lambda (constraint) (register-constraint me constraint)) constraints)
   me)
 
