@@ -5,8 +5,9 @@
   (eq-get form property))
 
 (define (set-property form property value)
-  (eq-put! form property value)
-  (update-form form))
+  (let ((val (eq-put! form property value)))
+    (update-form form)
+    val))
 
 
 (define (same-type? form-a form-b)
