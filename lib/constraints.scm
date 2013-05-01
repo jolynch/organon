@@ -53,48 +53,50 @@
 (define (register-constraint name constraint)
   (register-with *constraints* name constraint))
 
-(define (make-basic-constraint forms func)
+
+;; Constraints have the following calling convention
+;; (constraint) -> if the node is dirty, it will evaluate the constraint,
+;; otherwise it will use the value last returned.  This results in a float
+;; between 0 and 1
+;;
+;; (constraint 'hint) -> Returns a list of hints where hints are an assoc list
+;; of form (symbol) -> list of bindings (assoc list), which provides suggested
+;; improvements to the bindings
+
+(define (dispatch-constraint self args operands func hint-func)
+  ;; We should allow people to use hint as a form
+  (if (and (not (null? args)) (symbol? (car args)) (eq? (car args) 'hint))
+    (apply hint-func operands)
+    (cond
+      ((dirty? self)
+       (pp "Evaluating constraint")
+       (let ((value
+               (if (null? args)
+                 (apply func operands)
+                 (apply func args))))
+         (make-clean self value)
+         (propagate self)
+         value))
+      (else
+        (display "Using cached value for ")(write self)(newline)
+        (get-value self)))))
+
+(define (make-basic-constraint forms func #!optional hint-func)
+  (make-constraint 'form forms func hint-func))
+
+(define (make-compound-constraint constraints func #!optional hint-func)
+  (make-constraint 'constraint constraints func hint-func))
+
+(define (make-constraint type operands func #!optional hint-func)
   (define me
     (make-entity
       (lambda (self . args)
-        (cond
-          ((dirty? self)
-           (pp "Evaluating basic constraint")
-           (let ((value
-                   (if (null? args)
-                     (apply func forms)
-                     (apply func args))))
-             (make-clean self value)
-             ;; Very important to mark self clean before propagating up
-             (propagate self)
-             value))
-          (else
-            (display "Using cached value for ")(write self)(newline)
-            (get-value self))))
+        (dispatch-constraint self args operands func hint-func))
       '(dirty)))
-  (for-each (lambda (form) (register-form me form)) forms)
+  (let ((register-function (eval (symbol 'register- type) user-initial-environment)))
+    (for-each (lambda (operand) (register-function me operand)) operands))
   me)
 
-(define (make-compound-constraint constraints func)
-  (define me
-    (make-entity
-      (lambda (self . args)
-        (cond
-          ((dirty? self)
-           (pp "Evaluating compound constraint")
-           (let ((value
-                   (if (null? args)
-                     (apply func constraints)
-                     (apply func args))))
-             (make-clean self value)
-             (propagate self)
-             value))
-          (else
-            (display "Using cached value for ")(write self)(newline)
-            (get-value self))))
-      '(dirty)))
-  (for-each (lambda (constraint) (register-constraint me constraint)) constraints)
-  me)
 
 ;; Some tests
 
