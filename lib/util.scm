@@ -5,9 +5,10 @@
 
 (define (pretty-print nodes)
   (define (print node depth)
-    (display node)(write-string " ")(display depth)(newline)i
+    (display node)(write-string " ")(display depth)(newline)
     (for-each
       (lambda (node)
         (print node (+ 1 depth)))
       '()))
   (for-each (lambda (node) (print node 0)) nodes))
+
