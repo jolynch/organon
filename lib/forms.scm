@@ -11,16 +11,13 @@
     val))
 
 (define (capture-bindings form)
-  (eq-plist-simple form)
-)
+  (eq-plist-simple form))
 
 (define (apply-bindings form bindings)
-  (for-each (lambda (binding) (set-property form (car binding) (cdr binding))) bindings)
-)
+  (for-each (lambda (binding) (set-property form (car binding) (cdr binding))) bindings))
 
 (define (same-type? form-a form-b)
-  (equal? (eq-ordered-plist form-a) (eq-ordered-plist form-b))
-)
+  (equal? (eq-ordered-plist form-a) (eq-ordered-plist form-b)))
 
 (define (pp-form form) (pp (capture-bindings form)))
 
@@ -39,8 +36,7 @@
 ;; declare-form-by-properties - declares the form and initializes all the
 ;; properties to null (ie the empty list)
 (define (declare-form-by-properties name properties)
- (make-form-by-properties name (map (lambda (x) (list x '())) properties))
-)
+ (make-form-by-properties name (map (lambda (x) (list x '())) properties)))
 
 ;; register a type with a list of properties
 (define (declare-form-type type properties) (eq-put! 'form-types type properties))
@@ -57,8 +53,7 @@
       (declare-form-by-properties name my-type))))
 
 (define (declare-type-inherits type-a type-b)
-  (eq-put! 'form-inherits type-a type-b)
-)
+  (eq-put! 'form-inherits type-a type-b))
 
 ;; ================================================================================
 ;; form declarations (will be moved to demo folder soon)
