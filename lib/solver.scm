@@ -11,8 +11,8 @@
 ;; if needed, will occur at the constraint level.
 
 ;; iterate over a targeted constraint, calling the supplied scoring function
-;; after applying the hint's suggested bindings. Return a list of the scores for
-;; each hint.
+;; after applying the hint's suggested bindings. Return a list of the scores
+;; corresponding to the constraint's hints.
 (define (hint-iterator target-constraint scoring-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
   (ppd "iterator") (ppd user-initial-environment)
@@ -27,6 +27,9 @@
       )) forms-to-hints)
   ))
 
+;; iterate recursively over the objective constraints, descending into their
+;; children (not implemented yet) and calling the hint-iterator on each of them
+;; with the passed scoring-function.
 (define (iterative-solver forms objective-constraints scoring-function)
   (let ( (root-bindings (map capture-bindings forms)) )
     ;;(pp "root bindings are ") (display root-bindings)
@@ -41,6 +44,7 @@
      ) objective-constraints)
   ))
 
+;; wrapper to create a solver with a really stupid scoring function
 (define (basic-iterative-solver forms objective-constraints)
   (iterative-solver forms objective-constraints (lambda () 1.0)))
 
