@@ -10,28 +10,39 @@
 ;; propagation to actually propagate changes through the network.  Backtracking,
 ;; if needed, will occur at the constraint level.
 
-(define (hint-iterator target-constraint)
+;; iterate over a targeted constraint, calling the supplied scoring function
+;; after applying the hint's suggested bindings. Return a list of the scores for
+;; each hint.
+(define (hint-iterator target-constraint scoring-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
-  (ppd "iterator")
+  (ppd "iterator") (ppd user-initial-environment)
   (let ( (forms-to-hints (apply (eval target-constraint user-initial-environment) (list 'hint))) )
     (ppds "objective hints are ") (ppd forms-to-hints)
-    (for-each (lambda (form-binding-pair)
+    (map (lambda (form-binding-pair)
       (let ( (form (car form-binding-pair)) (binding (cdr form-binding-pair)) )
-        (ppds "examining form: ") (ppd form) ;; (ppds " ") (ppd (cdr (assq form forms-to-hints)))
+        (ppds "examining form: ") (ppd form)
         (apply-bindings form binding)
         (display "bound form: ") (display form) (pp-form form) (newline)
+        (scoring-function)
       )) forms-to-hints)
   ))
 
-(define (iterative-solver forms objective-constraints)
+(define (iterative-solver forms objective-constraints scoring-function)
   (let ( (root-bindings (map capture-bindings forms)) )
     ;;(pp "root bindings are ") (display root-bindings)
     (for-each (lambda (objective-constraint)
       (ppds "objective constraint: ") (ppd objective-constraint)
-      (hint-iterator objective-constraint)
-      (pretty-print objective-constraints)
+      (let ( (hint-scores (hint-iterator objective-constraint scoring-function)) )
+        ;; make some sort of decision...but we don't know how yet, so we'll
+        ;; just pretty print!
+        (ppd hint-scores)
+        (pretty-print objective-constraints)
+      )
      ) objective-constraints)
   ))
+
+(define (basic-iterative-solver forms objective-constraints)
+  (iterative-solver forms objective-constraints (lambda () 1.0)))
 
 ;; we will have two initial solver implementations
 

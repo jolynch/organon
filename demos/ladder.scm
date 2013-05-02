@@ -30,4 +30,5 @@
 
 (display "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-(iterative-solver '(left-hand right-hand) '(hands-far-away hands-end-of-rung))
+(basic-iterative-solver '(left-hand right-hand) '(hands-end-of-rung hands-far-away))
+;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
