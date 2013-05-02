@@ -4,24 +4,19 @@
 ;; straint propagation to actually propagate changes through the network.
 ;; Backtracking, if needed, will occur at the constraint level.
 
-;; (const)        -> eval constraints (returns range [0, 1])
-;; (const 'hint)  -> returns a list of a list of bindings for (form1, form2, ...) 
-;;                  of the form (bindings1, bindings2, ...) where bindings are 
-;;                  (property -> value, property -> value).
-;; (const forms)  -> ??
-
 (define (iterative-solver forms objective-constraints)
-  ;; capture the current bindings of the forms
   (let ( (root-bindings (map capture-bindings forms)) )
-    (for-each (lambda (objective-constraint) 
-      (let ( (this-objectives-hints (objective-constraints 'hint)) )
-        (for-each (lambda (form-to-hint-bindings)
-          (let ( (form (car form-to-hint-bindings))
-                 (hint-bindings (cdr form-to-hint-bindings)) )
-            (apply-bindings form hint-bindings)
-            (pp-form form)
-           )) this-objectives-hints)
-        ) objective-constraints))
+    ;;(pp "root bindings are ") (display root-bindings)
+    (for-each (lambda (objective-constraint)
+      ;;(pp "objective constraint ") (pp (eval objective-constraint user-initial-environment))
+      (let ( (forms-to-hints (apply (eval objective-constraint user-initial-environment) (list 'hint))) )
+        ;;(pp "objective hints are ") (display forms-to-hints)
+        (for-each (lambda (form)
+          ;;(pp "examining form") (pp form) (pp (cdr (assq form forms-to-hints)))
+          (apply-bindings form (cdr (assq form forms-to-hints)))
+          (display "form : ") (display form) (pp-form form) (newline)
+          ) (map car forms-to-hints) )
+        )) objective-constraints)
     ))
 
 ;; we will have two initial solver implementations
@@ -29,6 +24,7 @@
 ;; hill-climber - tries to maximize a weighted sum of objective-constraint
 ;; satisfaction ratings by examining all of the various constraint hints
 ;; (perhaps using simulated annealing)
+(define iterative-solver )
 
 ;; absolute-solver - if it is discovered that all objective-constraints have
 ;; been satisfied (are rated 1.0), terminate immediately. if it is discovered
