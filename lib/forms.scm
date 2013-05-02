@@ -22,7 +22,7 @@
   (equal? (eq-ordered-plist form-a) (eq-ordered-plist form-b))
 )
 
-(define (pp-form form) (pp (eq-ordered-plist form)))
+(define (pp-form form) (pp (capture-bindings form)))
 
 ;; TODO
 ;;(define (sub-type? form-a form-b)
