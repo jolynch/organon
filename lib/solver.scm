@@ -22,4 +22,15 @@
             (pp-form form)
            )) this-objectives-hints)
         ) objective-constraints))
-))
+    ))
+
+;; we will have two initial solver implementations
+
+;; hill-climber - tries to maximize a weighted sum of objective-constraint
+;; satisfaction ratings by examining all of the various constraint hints
+;; (perhaps using simulated annealing)
+
+;; absolute-solver - if it is discovered that all objective-constraints have
+;; been satisfied (are rated 1.0), terminate immediately. if it is discovered
+;; that one constraint cannot be satisfied (is rated < 1.0), give up
+;; immediately.
