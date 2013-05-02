@@ -1,4 +1,4 @@
-(define *debug* #t)
+(define *debug* #f)
 
 ;; Mapping of forms to dependent constraints
 (define *forms* (make-eq-hash-table))
@@ -74,7 +74,7 @@
     ((and (not (null? args)) (symbol? (car args)) (eq? (car args) 'children))
      operands)
     ((dirty? self)
-     (pp "Evaluating constraint")
+     (if *debug* (pp "Evaluating constraint"))
      (let ((value
              (if (null? args)
                (apply func operands)
@@ -83,7 +83,7 @@
        (propagate self)
        value))
     (else
-      (display "Using cached value for ")(write self)(newline)
+      (if *debug* (begin (display "Using cached value for ")(write self)(newline)))
       (get-value self))))
 
 (define (make-basic-constraint forms func #!optional hint-func)
