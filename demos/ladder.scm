@@ -21,5 +21,5 @@
                                   (h2 (heor)))
                               (and (> h1 .25) (> h2 .25))))))
 
-(hands-on-ladder)
+(display "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 

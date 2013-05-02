@@ -1,4 +1,5 @@
 (load "../lib/eq-properties")
 (load "../lib/forms")
 (load "../lib/constraints")
+(load "../lib/util")
 (load "repl")

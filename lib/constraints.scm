@@ -62,24 +62,29 @@
 ;; (constraint 'hint) -> Returns a list of hints where hints are an assoc list
 ;; of form (symbol) -> list of bindings (assoc list), which provides suggested
 ;; improvements to the bindings
+;;
+;; (constraint 'children) -> Returns a list of the constraints that are
+;; children of this constraint
 
 (define (dispatch-constraint self args operands func hint-func)
   ;; We should allow people to use hint as a form
-  (if (and (not (null? args)) (symbol? (car args)) (eq? (car args) 'hint))
-    (apply hint-func operands)
-    (cond
-      ((dirty? self)
-       (pp "Evaluating constraint")
-       (let ((value
-               (if (null? args)
-                 (apply func operands)
-                 (apply func args))))
-         (make-clean self value)
-         (propagate self)
-         value))
-      (else
-        (display "Using cached value for ")(write self)(newline)
-        (get-value self)))))
+  (cond
+    ((and (not (null? args)) (symbol? (car args)) (eq? (car args) 'hint))
+     (apply hint-func operands))
+    ((and (not (null? args)) (symbol? (car args)) (eq? (car args) 'children))
+     operands)
+    ((dirty? self)
+     (pp "Evaluating constraint")
+     (let ((value
+             (if (null? args)
+               (apply func operands)
+               (apply func args))))
+       (make-clean self value)
+       (propagate self)
+       value))
+    (else
+      (display "Using cached value for ")(write self)(newline)
+      (get-value self))))
 
 (define (make-basic-constraint forms func #!optional hint-func)
   (make-constraint 'form forms func hint-func))
