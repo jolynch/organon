@@ -2,4 +2,5 @@
 (load "../lib/forms")
 (load "../lib/constraints")
 (load "../lib/util")
+(load "../lib/solver")
 (load "repl")
