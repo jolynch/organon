@@ -81,6 +81,8 @@
      (apply func (cdr args)))
     ((test-args 'type)
      type)
+    ((test-args 'leaf?)
+     (eq? type 'form))
     ((dirty? self)
      (if *debug* (pp "Evaluating constraint"))
      (let ((value (apply func operands)))
