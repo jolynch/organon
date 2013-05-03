@@ -66,19 +66,24 @@
 ;; (constraint 'children) -> Returns a list of the constraints that are
 ;; children of this constraint
 
-(define (dispatch-constraint self args operands func hint-func)
+(define (dispatch-constraint type self args operands func hint-func)
+  ;; Allows dispatch on suplied type
+  (define (test-args pattern)
+    (and (not (null? args)) (symbol? (car args)) (eq? (car args) pattern)))
+
   ;; We should allow people to use hint as a form
   (cond
-    ((and (not (null? args)) (symbol? (car args)) (eq? (car args) 'hint))
+    ((test-args 'hint)
      (apply hint-func operands))
-    ((and (not (null? args)) (symbol? (car args)) (eq? (car args) 'children))
+    ((test-args 'children)
      operands)
+    ((test-args 'eval)
+     (apply func (cdr args)))
+    ((test-args 'type)
+     type)
     ((dirty? self)
      (if *debug* (pp "Evaluating constraint"))
-     (let ((value
-             (if (null? args)
-               (apply func operands)
-               (apply func args))))
+     (let ((value (apply func operands)))
        (make-clean self value)
        (propagate self)
        value))
@@ -96,7 +101,7 @@
   (define me
     (make-entity
       (lambda (self . args)
-        (dispatch-constraint self args operands func hint-func))
+        (dispatch-constraint type self args operands func hint-func))
       '(dirty)))
   (let ((register-function (eval (symbol 'register- type) user-initial-environment)))
     (for-each (lambda (operand) (register-function me operand)) operands))
