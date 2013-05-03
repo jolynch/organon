@@ -3,4 +3,5 @@
 (load "../lib/constraints")
 (load "../lib/util")
 (load "../lib/solver")
+(load "form-lib")
 (load "repl")
