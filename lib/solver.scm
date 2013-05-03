@@ -16,7 +16,7 @@
 (define (hint-iterator target-constraint scoring-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
   (ppd "iterator") (ppd user-initial-environment)
-  (let ( (forms-to-hints (apply (eval target-constraint user-initial-environment) (list 'hint))) )
+  (let ( (forms-to-hints (target-constraint 'hint)) )
     (ppds "objective hints are ") (ppd forms-to-hints)
     (map (lambda (form-binding-pair)
       (let ( (form (car form-binding-pair)) (binding (cdr form-binding-pair)) )
@@ -27,21 +27,30 @@
       )) forms-to-hints)
   ))
 
+
+;; given a single objective, returns an list of leaf constraints (which may
+;; include the objective constraint, if it is a leaf)
+(define (get-constraint-leaves objective-constraint) 
+  (if (objective-constraint 'leaf?)
+      objective-constraint
+      (map get-constraint-leaves (objective-constraint 'children))))
+
 ;; iterate recursively over the objective constraints, descending into their
 ;; children (not implemented yet) and calling the hint-iterator on each of them
 ;; with the passed scoring-function.
 (define (iterative-solver forms objective-constraints scoring-function)
-  (let ( (root-bindings (map capture-bindings forms)) )
-    ;;(pp "root bindings are ") (display root-bindings)
-    (for-each (lambda (objective-constraint)
-      (ppds "objective constraint: ") (ppd objective-constraint)
-      (let ( (hint-scores (hint-iterator objective-constraint scoring-function)) )
+  (let ( (root-bindings (map capture-bindings forms))
+         (all-constraint-leaves (car (map get-constraint-leaves objective-constraints))) )
+    (pp "all-constraint-leaves ") (display all-constraint-leaves)
+    (for-each (lambda (leaf-constraint)
+      (ppds "leaf constraint: ") (ppd leaf-constraint)
+      (let ( (hint-scores (hint-iterator leaf-constraint scoring-function)) )
         ;; make some sort of decision...but we don't know how yet, so we'll
         ;; just pretty print!
         (ppd hint-scores)
         (pretty-print objective-constraints)
       )
-     ) objective-constraints)
+     ) all-constraint-leaves)
   ))
 
 ;; wrapper to create a solver with a really stupid scoring function
