@@ -15,16 +15,16 @@
                              0.5
                              0.0))
                          (lambda (h1 h2 d)
-                           (list (cons h1 (list (list 'vertices (make-vertex 1 2 3))))
-                                 (cons h2 (list (list 'vertices (make-vertex 4 5 6))))))))
+                           (list (cons h1 (list (list 'vertices (make-vertex 2 4 8))))
+                                 (cons h2 (list (list 'vertices (make-vertex 8 4 2))))))))
 
 (define hands-end-of-rung (make-basic-constraint
                             '(left-hand right-hand)
                             (lambda (h1 h2)
                               0.5)
                             (lambda (h1 h2)
-                           (list (cons h1 (list (list 'vertices (make-vertex 1 2 3))))
-                                 (cons h2 (list (list 'vertices (make-vertex 4 5 6))))))))
+                           (list (cons h1 (list (list 'vertices (make-vertex 1 3 5))))
+                                 (cons h2 (list (list 'vertices (make-vertex 5 3 1))))))))
 
 (define hands-on-ladder (make-compound-constraint
                           (list hands-far-away hands-end-of-rung)

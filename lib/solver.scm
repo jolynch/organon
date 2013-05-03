@@ -10,14 +10,12 @@
 ;; propagation to actually propagate changes through the network.  Backtracking,
 ;; if needed, will occur at the constraint level.
 
-;; iterate over a targeted constraint, calling the supplied scoring function
-;; after applying the hint's suggested bindings. Return a list of the scores
-;; corresponding to the constraint's hints.
-(define (hint-iterator target-constraint scoring-function)
+;; TODO: document me
+(define (iteratively-score-hints list-of-hints scoring-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
-  (ppd "iterator") (ppd user-initial-environment)
-  (let ( (forms-to-hints (target-constraint 'hint)) )
-    (ppds "objective hints are ") (ppd forms-to-hints)
+  (ppds "list-of-hints is ") (ppd list-of-hints)
+  (map (lambda (forms-to-hints)
+    (ppds "forms -> hints assoc list is ") (ppd forms-to-hints)
     (map (lambda (form-binding-pair)
       (let ( (form (car form-binding-pair)) (binding (cdr form-binding-pair)) )
         (ppds "examining form: ") (ppd form)
@@ -25,33 +23,41 @@
         (display "bound form: ") (display form) (pp-form form) (newline)
         (scoring-function)
       )) forms-to-hints)
-  ))
-
+    ) list-of-hints))
 
 ;; given a single objective, returns an list of leaf constraints (which may
 ;; include the objective constraint, if it is a leaf)
+;; TODO: convert to a set so we don't have duplicate leafs included
 (define (get-constraint-leaves objective-constraint) 
   (if (objective-constraint 'leaf?)
       objective-constraint
       (map get-constraint-leaves (objective-constraint 'children))))
 
+(define (get-hints target-constraint)
+  (target-constraint 'hint))
+
 ;; iterate recursively over the objective constraints, descending into their
 ;; children (not implemented yet) and calling the hint-iterator on each of them
 ;; with the passed scoring-function.
 (define (iterative-solver forms objective-constraints scoring-function)
-  (let ( (root-bindings (map capture-bindings forms))
-         (all-constraint-leaves (car (map get-constraint-leaves objective-constraints))) )
-    (pp "all-constraint-leaves ") (display all-constraint-leaves)
-    (for-each (lambda (leaf-constraint)
-      (ppds "leaf constraint: ") (ppd leaf-constraint)
-      (let ( (hint-scores (hint-iterator leaf-constraint scoring-function)) )
-        ;; make some sort of decision...but we don't know how yet, so we'll
-        ;; just pretty print!
-        (ppd hint-scores)
-        (pretty-print objective-constraints)
-      )
-     ) all-constraint-leaves)
-  ))
+  (let* ( (root-bindings (map capture-bindings forms))
+          (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
+          (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
+          (all-hints (map get-hints all-constraint-leaves)) )
+
+    (display "all-constraint-leaves ") (pp all-constraint-leaves)
+    (display "all hints") (pp all-hints)
+    (display "all susbsets of hints") (pp (non-empty-subsets all-hints))
+
+    ;; generate the set of all possible subsets of hints, then compute their scores
+    (let* ( (all-hints-subsets (non-empty-subsets all-hints)) 
+            (accumulated-hint-scores (map (lambda (hint-subset)
+                                            (restore-root-bindings)
+                                            (iteratively-score-hints hint-subset scoring-function)
+                                            ) all-hints-subsets)) )
+      (restore-root-bindings)
+      (pp accumulated-hint-scores)
+  )))
 
 ;; wrapper to create a solver with a really stupid scoring function
 (define (basic-iterative-solver forms objective-constraints)
