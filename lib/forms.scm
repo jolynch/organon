@@ -19,6 +19,31 @@
 (define (same-type? form-a form-b)
   (equal? (eq-ordered-plist form-a) (eq-ordered-plist form-b)))
 
+;; Tells if a form implements the interface provided by type
+(define (is-type? form type)
+  (define (implements? form type)
+    (if (eq-get 'form-types type)
+      (let ((desired-properties (eq-get 'form-types type)))
+        (reduce (lambda (x y) (and x y)) #t
+                (map (lambda (x) (has-property? form x)) desired-properties)))
+      #f))
+  (reduce (lambda (x y) (and x y)) #t
+          (map (lambda (x) (implements? form x)) (all-parents type))))
+
+;; Gets all parent types for a given type
+(define (all-parents type)
+  (let find-parents ((result (list type))
+                     (ntype type))
+    (if (eq-get 'form-inherits ntype)
+      (find-parents (cons (eq-get 'form-inherits ntype) result) (eq-get 'form-inherits ntype))
+      result)))
+
+;; Check if a form is many types
+(define (is-multiple-type? form types)
+  (reduce (lambda (x y) (and x y)) #t
+          (map (lambda (x) (is-type? form x)) types)))
+
+
 (define (pp-form form) (pp (capture-bindings form)))
 
 ;; TODO
@@ -65,6 +90,8 @@
 
 (declare-type-inherits '3D-hand-form 'hand-form)
 (declare-form-type '3D-hand-form (list 'finger1-box 'finger2-box 'finger3-box 'finger4-box 'finger5-box))
+
+(declare-form-type 'basic (list 'value))
 
 ;; ================================================================================
 ;; instantiations (will be moved to demo folder soon)

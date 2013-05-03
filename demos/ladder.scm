@@ -4,12 +4,17 @@
 (declare-form 'left-hand '3D-hand-form)
 (declare-form 'right-hand '3D-hand-form)
 (declare-form 'rung '3D-form)
+(declare-form 'desired-distance 'basic)
 
 (define hands-far-away (make-basic-constraint
-                         '(left-hand right-hand)
-                         (lambda (h1 h2)
-                           0.5)
-                         (lambda (h1 h2)
+                         '(left-hand right-hand desired-distance)
+                         (lambda (lh rh d)
+                           (if (and (is-type? lh '3D-hand-form)
+                                    (is-type? rh '3D-hand-form)
+                                    (is-type? d 'basic))
+                             0.5
+                             0.0))
+                         (lambda (h1 h2 d)
                            (list (cons h1 (list (list 'vertices (make-vertex 1 2 3))))
                                  (cons h2 (list (list 'vertices (make-vertex 4 5 6))))))))
 
@@ -29,8 +34,6 @@
                               (and (> h1 .25) (> h2 .25))))))
 
 (display "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
-
-;;(basic-iterative-solver '(left-hand right-hand) (list hands-end-of-rung hands-far-away))
 
 (basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
 
