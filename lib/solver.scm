@@ -16,8 +16,8 @@
   (ppds "list-of-hints is ") (ppd list-of-hints)
   (map (lambda (form-bindings-pair)
     (ppds "form -> bindings assoc list is ") (ppd form-bindings-pair)
-    (let ( (form (car form-bindings-pair)) (bindings (cdr form-bindings-pair)) )
-        (ppds "form -> binding is") (ppds form-bindings-pair)
+    (let ( (form (car form-bindings-pair)) (bindings (car (cdr form-bindings-pair))) )
+        (ppds "binding are") (ppds bindings)
         (ppds "examining form: ") (ppd form)
         (apply-bindings form bindings)
         (display "bound form: ") (display form) (pp-form form) (newline)
@@ -67,7 +67,7 @@
     (let* ( (scores (map (lambda (x) (x)) objective-constraints))
             (weights-and-scores (zip scores objective-constraint-weights)) )
       (pp weights-and-scores)
-          (apply + (map (lambda (x) (apply * x)) weights-and-scores))
+      (apply + (map (lambda (x) (apply * x)) weights-and-scores))
       )))
 
 ;; wrapper to create a solver with a basic scoring function
