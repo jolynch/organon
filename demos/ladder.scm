@@ -54,9 +54,13 @@
                                          (dis (distance left-origin right-origin)))
                                     (min 1.0 (/ dis (get-value d)))))
                                  (else 0.0)))
-                         (lambda (h1 h2 d)
-                           (list (list h1 (list (list 'vertices (make-vertex 2 4 8))))
-                                 (list h2 (list (list 'vertices (make-vertex 8 4 2))))))))
+                         (lambda (lh rh d)
+                           (let* ((lhof (get-property lh 'frame))
+                                  (rhof (get-property rh 'frame))
+                                  (lhq (frame-quat lhof))
+                                  (rhq (frame-quat rhof)))
+                             (list (list lh (list (list 'frame (make-frame (make-vertex -10 0 0) lhq))))
+                                   (list rh (list (list 'frame (make-frame (make-vertex 10 0 0) rhq)))))))))
 
 (define hands-end-of-rung (make-basic-constraint
                             '(left-hand right-hand desired-closeness rung)

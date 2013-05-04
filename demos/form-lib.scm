@@ -21,6 +21,8 @@
 (define make-vertex make-vector)
 (define (make-quaternion q1 q2 q3 q4) (list q1 q2 q3 q4))
 (define (make-frame vector quaternion) (list vector quaternion))
+(define (frame-vector f) (car f))
+(define (frame-quat f) (cadr f))
 
 ;; Vector convenience methods
 
