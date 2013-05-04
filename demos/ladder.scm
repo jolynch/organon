@@ -37,38 +37,55 @@
 (define hands-far-away
   (make-basic-constraint
     '(left-hand right-hand desired-distance)
-    (lambda (lh rh d)
-      (cond ((and (is-type? lh '3D-hand-form)
-                  (is-type? rh '3D-hand-form)
+    (lambda (left-hand right-hand d)
+      (cond ((and (is-type? left-hand '3D-hand-form)
+                  (is-type? right-hand '3D-hand-form)
                   (is-type? d 'basic))
-             (let* ((left-origin (car (get-property lh 'frame)))
-                    (right-origin (car (get-property rh 'frame)))
+             (let* ((left-origin (car (get-property left-hand 'frame)))
+                    (right-origin (car (get-property right-hand 'frame)))
                     (dis (distance left-origin right-origin)))
-               (pp left-origin)
-               (pp right-origin)
-               (pp dis)
                (min 1.0 (/ dis (get-value d)))))
             (else 0.0)))
-    (lambda (lh rh d)
-      (let* ((lhof (get-property lh 'frame))
-             (rhof (get-property rh 'frame))
-             (lhq (frame-quat lhof))
-             (rhq (frame-quat rhof)))
-        (make-binding-list)))))
+    (lambda (left-hand right-hand d)
+      (let* ((left-hand-old (get-property left-hand 'frame))
+             (right-hand-old (get-property right-hand 'frame))
+             (left-hand-vector (frame-vector left-hand-old))
+             (right-hand-vector (frame-vector right-hand-old))
+             (left-hand-quat (frame-quat left-hand-old))
+             (right-hand-quat (frame-quat right-hand-old))
+             (left-hand-inverted (scale-vector
+                                   (unit
+                                     (sub-vector right-hand-vector left-hand-vector))
+                                   -1))
+             (right-hand-inverted (scale-vector
+                                    (unit
+                                      (sub-vector left-hand-vector right-hand-vector))
+                                   -1)))
+        (make-binding-list
+          (make-binding
+            left-hand
+            (list 'frame (make-frame (add-vector left-hand-vector left-hand-inverted)
+                                     left-hand-quat)))
+          (make-binding
+            right-hand
+            (list 'frame (make-frame (add-vector right-hand-vector right-hand-inverted)
+                                     right-hand-quat))))))))
 
 (define hands-end-of-rung
   (make-basic-constraint
     '(left-hand right-hand desired-closeness rung)
-    (lambda (lh rh d r)
+    ;; Constraint is that the left hand should be near the left rung goal
+    ;; and the right hand should be near the right rung goal
+    (lambda (left-hand right-hand d rung)
       (cond
-        ((and (is-type? lh '3D-hand-form)
-              (is-type? rh '3D-hand-form)
+        ((and (is-type? left-hand '3D-hand-form)
+              (is-type? right-hand '3D-hand-form)
               (is-type? d 'basic)
-              (is-type? r 'rungt))
-         (let* ((left-origin (car (get-property lh 'frame)))
-                (right-origin (car (get-property rh 'frame)))
-                (left-rung (get-property r 'left-rung))
-                (right-rung (get-property r 'right-rung))
+              (is-type? rung 'rungt))
+         (let* ((left-origin (car (get-property left-hand 'frame)))
+                (right-origin (car (get-property right-hand 'frame)))
+                (left-rung (get-property rung 'left-rung))
+                (right-rung (get-property rung 'right-rung))
                 (disl (distance left-origin left-rung))
                 (disr (distance right-origin right-rung)))
            (min
@@ -76,21 +93,33 @@
              (+ (/ (min 1.0 (/ (get-value d) disl)) 2.0)
                 (/ (min 1.0 (/ (get-value d) disr)) 2.0)))))
         (else 0.0)))
-    (lambda (lh rh d r)
-      (let* ((lhof (get-property lh 'frame))
-             (rhof (get-property rh 'frame))
-             (lhq  (frame-quat lhof))
-             (rhq  (frame-quat rhof))
-             (lhv  (frame-vector lhof))
-             (rhv  (frame-vector rhof))
-             (lhr  (get-property r 'left-rung))
-             (rhr  (get-property r 'right-rung))
-             (lhg  (interpolate lhv lhr 3))
-             (rhg  (interpolate rhv rhr 3))
-             (lhgf (map (lambda (goal) (list 'frame (make-frame goal lhq))) lhg))
-             (rhgf (map (lambda (goal) (list 'frame (make-frame goal rhq))) rhg)))
-        (join-lists (list (apply make-binding-list (map (lambda (goal) (make-binding lh goal)) lhgf))
-                          (apply make-binding-list (map (lambda (goal) (make-binding rh goal)) rhgf))))))))
+    ;; Hint generates four possible solution points between each hand and
+    ;; the goal rung
+    (lambda (left-hand right-hand d rung)
+      (let* ((left-hand-old (get-property left-hand 'frame))
+             (right-hand-old (get-property right-hand 'frame))
+             (left-hand-quat  (frame-quat left-hand-old))
+             (right-hand-quat  (frame-quat right-hand-old))
+             (left-hand-vector  (frame-vector left-hand-old))
+             (right-hand-vector  (frame-vector right-hand-old))
+             (left-hand-rung  (get-property rung 'left-rung))
+             (right-hand-rung  (get-property rung 'right-rung))
+             (left-hand-goal  (interpolate left-hand-vector left-hand-rung 4))
+             (right-hand-goal  (interpolate right-hand-vector right-hand-rung 4))
+             (left-hand-goal-frame
+               (map (lambda (goal)
+                      (list 'frame (make-frame goal left-hand-quat))) left-hand-goal))
+             (right-hand-goal-frame
+               (map (lambda (goal)
+                      (list 'frame (make-frame goal right-hand-quat))) right-hand-goal)))
+        (join-lists (list (apply make-binding-list
+                                 (map (lambda (goal)
+                                        (make-binding left-hand goal))
+                                      left-hand-goal-frame))
+                          (apply make-binding-list
+                                 (map (lambda (goal)
+                                        (make-binding right-hand goal))
+                                      right-hand-goal-frame))))))))
 
 (define hands-on-ladder
   (make-compound-constraint

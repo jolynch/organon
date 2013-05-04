@@ -33,6 +33,7 @@
                (* (vy v1) s)
                (* (vz v1) s)))
 
+;; V1 - V2
 (define (sub-vector v1 v2)
   (make-vector (- (vx v1) (vx v2))
                (- (vy v1) (vy v2))
@@ -52,9 +53,12 @@
       (else ls)))
   (reverse (iter x y '())))
 
+(define (unit v1)
+  (scale-vector v1 (/ 1.0 (mag v1))))
+
 (define (interpolate v1 v2 num)
   (let* ((direction (sub-vector v2 v1))
-         (udir (scale-vector direction (/ 1.0 (mag direction))))
+         (udir (unit direction))
          (scale (/ (distance v1 v2) (- num 1))))
     (map (lambda (n)
            (add-vector v1 (scale-vector udir (* n scale))))
