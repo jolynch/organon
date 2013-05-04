@@ -14,15 +14,15 @@
 (define (iteratively-score-hints list-of-hints scoring-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
   (ppds "list-of-hints is ") (ppd list-of-hints)
-  (map (lambda (forms-to-hints)
-    (ppds "forms -> hints assoc list is ") (ppd forms-to-hints)
-    (map (lambda (form-binding-pair)
-      (let ( (form (car form-binding-pair)) (binding (cdr form-binding-pair)) )
+  (map (lambda (form-bindings-pair)
+    (ppds "form -> bindings assoc list is ") (ppd form-bindings-pair)
+    (let ( (form (car form-bindings-pair)) (bindings (cdr form-bindings-pair)) )
+        (ppds "form -> binding is") (ppds form-bindings-pair)
         (ppds "examining form: ") (ppd form)
-        (apply-bindings form binding)
+        (apply-bindings form bindings)
         (display "bound form: ") (display form) (pp-form form) (newline)
         (scoring-function)
-      )) forms-to-hints)
+      )
     ) list-of-hints))
 
 ;; given a single objective, returns an list of leaf constraints (which may
@@ -36,6 +36,9 @@
 (define (get-hints target-constraint)
   (target-constraint 'hint))
 
+(define (join-lists list-of-lists)
+  (fold-right (lambda (a b) (append a b)) '() list-of-lists))
+
 ;; iterate recursively over the objective constraints, descending into their
 ;; children (not implemented yet) and calling the hint-iterator on each of them
 ;; with the passed scoring-function.
@@ -43,7 +46,7 @@
   (let* ( (root-bindings (map capture-bindings forms))
           (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
           (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
-          (all-hints (map get-hints all-constraint-leaves)) )
+          (all-hints (join-lists (map get-hints all-constraint-leaves))) )
 
     (display "all-constraint-leaves ") (pp all-constraint-leaves)
     (display "all hints") (pp all-hints)
