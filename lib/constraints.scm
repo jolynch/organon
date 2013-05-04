@@ -16,7 +16,7 @@
 (define (make-clean entity value)
   (set-entity-extra! entity (cons 'clean value)))
 
-(define (get-value entity)
+(define (get-cached entity)
   (cdr (entity-extra entity)))
 
 ;; Methods to cause propagation
@@ -91,7 +91,7 @@
        value))
     (else
       (if *debug* (begin (display "Using cached value for ")(write self)(newline)))
-      (get-value self))))
+      (get-cached self))))
 
 (define (make-basic-constraint forms func #!optional hint-func)
   (make-constraint 'form forms func hint-func))

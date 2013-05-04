@@ -1,5 +1,5 @@
 (define *demo-debug* #t)
-(define *debug* #t)
+(define *debug* #f)
 
 (declare-form 'left-hand '3D-hand-form)
 (declare-form 'right-hand '3D-hand-form)
@@ -76,7 +76,7 @@
                                      (+ (/ (min 1.0 (/ (get-value d) disl)) 2.0)
                                         (/ (min 1.0 (/ (get-value d) disr)) 2.0)))))
                                 (else 0.0)))
-                            (lambda (h1 h2 d)
+                            (lambda (h1 h2 d r)
                               (list (list h1 (list (list 'vertices (make-vertex 1 3 5))))
                                     (list h2 (list (list 'vertices (make-vertex 5 3 1))))))))
 
@@ -87,8 +87,7 @@
                                   (h2 (heor)))
                               (/ (+ h1 h2) 2.0)))))
 
-;;(display "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
-
+(pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
 ;;(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
 
