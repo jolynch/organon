@@ -5,15 +5,57 @@
 (declare-form 'right-hand '3D-hand-form)
 (declare-form 'rung '3D-form)
 (declare-form 'desired-distance 'basic)
+(declare-form 'axis 'basic)
+
+(define (distance v1 v2)
+  (display v1)
+  (newline)
+  (display v2)
+  (newline)
+  (if (and (eq? (length v1) 3) (eq? (length v2) 3))
+  (sqrt (+ (square (- (first v1) (first v2)))
+           (square (- (second v1) (second v2)))
+           (square (- (third v1) (third v2)))))
+  0.0))
+
+;; Set up the initial conditions
+
+(set-property 'left-hand 'vertices (list (make-vertex -2 -1 0)
+                                         (make-vertex -2 1 1)
+                                         (make-vertex 0 -1 0)
+                                         (make-vertex 0 1 0)))
+
+(set-property 'left-hand 'frame
+              (make-frame (make-vertex -1 0 0) (make-quaternion 0 0 0 1)))
+
+(set-property 'right-hand 'vertices (list (make-vertex 2 -1 0)
+                                          (make-vertex 2 1 1)
+                                          (make-vertex 0 -1 0)
+                                          (make-vertex 0 1 0)))
+
+(set-property 'right-hand 'frame
+              (make-frame (make-vertex 1 0 0) (make-quaternion 0 0 0 1)))
+
+(set-property 'rung 'frame
+              (make-frame (make-vertex 0 0 0) (make-quaternion 0 0 0 1)))
+
+(set-property 'rung 'vertices (list (make-vertex -10 0 0)
+                                    (make-vertex 10 0 0)))
+
+(set-property 'desired-distance 'value 5)
+(set-property 'axis 'value (make-vector 1 0 0))
 
 (define hands-far-away (make-basic-constraint
                          '(left-hand right-hand desired-distance)
                          (lambda (lh rh d)
-                           (if (and (is-type? lh '3D-hand-form)
+                           (cond ((and (is-type? lh '3D-hand-form)
                                     (is-type? rh '3D-hand-form)
                                     (is-type? d 'basic))
-                             0.5
-                             0.0))
+                                  (let* ((left-origin (car (get-property lh 'frame)))
+                                         (right-origin (car (get-property rh 'frame)))
+                                         (dis (distance left-origin right-origin)))
+                                    (min 1.0 (/ dis (get-property d 'value)))))
+                                 (else 0.0)))
                          (lambda (h1 h2 d)
                            (list (list h1 (list (list 'vertices (make-vertex 2 4 8))))
                                  (list h2 (list (list 'vertices (make-vertex 8 4 2))))))))
