@@ -89,7 +89,7 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-;;(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
+(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 

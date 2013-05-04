@@ -21,7 +21,7 @@
         (ppds "examining form: ") (ppd form)
         (apply-bindings form bindings)
         (display "bound form: ") (display form) (pp-form form) (newline)
-        (scoring-function)o
+        (scoring-function)
       )
     ) list-of-hints))
 
@@ -65,9 +65,9 @@
 (define (simple-scoring-func objective-constraints objective-constraint-weights )
   (lambda () 
     (let* ( (scores (map (lambda (x) (x)) objective-constraints))
-            (weights-and-scores  (zip scores objective-constraint-weights)) )
+            (weights-and-scores (zip scores objective-constraint-weights)) )
       (pp weights-and-scores)
-          (+ (map (lambda (x) (* (car x) (cdr x))) weights-and-scores))
+          (apply + (map (lambda (x) (apply * x)) weights-and-scores))
       )))
 
 ;; wrapper to create a solver with a basic scoring function
