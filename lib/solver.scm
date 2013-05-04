@@ -1,6 +1,6 @@
 (define *solver-debug* #t)
 
-;; pretty print debug 
+;; pretty print debug
 (define (ppd . x) (if (or *debug* *solver-debug*) (apply pp x)))
 ;; pretty print debug short (no newline)
 (define (ppds . x) (if (or *debug* *solver-debug*) (apply display x)))
@@ -21,7 +21,7 @@
         (ppds "examining form: ") (ppd form)
         (apply-bindings form bindings)
         (display "bound form: ") (display form) (pp-form form) (newline)
-        (scoring-function)
+        (scoring-function)o
       )
     ) list-of-hints))
 
@@ -62,9 +62,22 @@
       (pp accumulated-hint-scores)
   )))
 
-;; wrapper to create a solver with a really stupid scoring function
+(define (simple-scoring-func objective-constraints objective-constraint-weights )
+  (lambda () 
+    (let* ( (scores (map (lambda (x) (x)) objective-constraints))
+            (weights-and-scores  (zip scores objective-constraint-weights)) )
+      (pp weights-and-scores)
+          (+ (map (lambda (x) (* (car x) (cdr x))) weights-and-scores))
+      )))
+
+;; wrapper to create a solver with a basic scoring function
 (define (basic-iterative-solver forms objective-constraints)
-  (iterative-solver forms objective-constraints (lambda () 1.0)))
+  (iterative-solver forms objective-constraints 
+                    (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1))))
+
+(define (weighted-iterative-solver forms objective-constraint objective-constraint-weights)
+  (iterative-solver forms objective-constraints 
+                    (simple-scoring-func objective-constraints objective-constraint-weights)))
 
 ;; we will have two initial solver implementations
 
