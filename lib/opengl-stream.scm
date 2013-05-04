@@ -13,25 +13,25 @@
 ;; > (close-connection) 
 ;; When you're done
 
-(load "util")
+;; (load "util")
 
 (define clear-screen-marker "(CLS)")
 (define port-number 1337)
 (define connection '())
 
 (define (frame->packet frame)
-  frame) 
+  (write-to-string frame))
 ;; "xyz(q1,q2,q3,q4)")
 
 (define (vertices->packet vertex-list)
-  vertex-list)
+  (write-to-string vertex-list))
 ;;  "(v1,v2,v3)(v4,v5,v6")
 
 (define (form->packet form)
   ;; write out the frame, then the vertex lists
   (assert (lambda () is-type? form '3D-form))
   (let ( (frame (get-property form 'frame)) (vertex-list (get-property form 'vertices)) )
-      (string-append "((" (frame->packet frame) ")(" (vertices->packet vertex-list)")")
+      (string-append "(" (frame->packet frame) (vertices->packet vertex-list) ")")
   ))
 
 (define (forms->packet forms)
@@ -47,12 +47,5 @@
 (define (close-connection)
   (close-port connection))
 
-(define (make-connection)
-  (set! connection (open-tcp-stream-socket "localhost" port-number)))
-
-;; (pp "making connection")
-;; (make-connection)
-;; (pp "writing port")
-;; (write-forms (list 3220 32820 3282))
-;; (pp "closing port")
-;; (close-connection)
+(define (make-connection hostname port)
+  (set! connection (open-tcp-stream-socket hostname port)))
