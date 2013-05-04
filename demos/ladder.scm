@@ -80,9 +80,13 @@
                                      (+ (/ (min 1.0 (/ (get-value d) disl)) 2.0)
                                         (/ (min 1.0 (/ (get-value d) disr)) 2.0)))))
                                 (else 0.0)))
-                            (lambda (h1 h2 d r)
-                              (list (list h1 (list (list 'vertices (make-vertex 1 3 5))))
-                                    (list h2 (list (list 'vertices (make-vertex 5 3 1))))))))
+                         (lambda (lh rh d r)
+                           (let* ((lhof (get-property lh 'frame))
+                                  (rhof (get-property rh 'frame))
+                                  (lhq (frame-quat lhof))
+                                  (rhq (frame-quat rhof)))
+                             (list (list lh (list (list 'frame (make-frame (make-vertex -10 0 0) lhq))))
+                                   (list rh (list (list 'frame (make-frame (make-vertex 10 0 0) rhq)))))))))
 
 (define hands-on-ladder (make-compound-constraint
                           (list hands-far-away hands-end-of-rung)
