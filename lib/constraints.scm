@@ -83,6 +83,8 @@
      type)
     ((test-args 'leaf?)
      (eq? type 'form))
+    ((test-args 'force)
+     (apply func operands))
     ((dirty? self)
      (if *debug* (pp "Evaluating constraint"))
      (let ((value (apply func operands)))
