@@ -29,3 +29,6 @@
 
 (define (non-empty-subsets L)
   (filter (lambda (x) (not (null? x))) (subsets L)))
+
+(define (assert expression)
+  (if (not (expression)) (error (string-append "assertion failed for expression: " expression))))
