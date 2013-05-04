@@ -8,13 +8,6 @@
 (declare-form 'desired-closeness 'basic)
 (declare-form 'axis 'basic)
 
-(define (distance v1 v2)
-  (if (and (eq? (length v1) 3) (eq? (length v2) 3))
-  (sqrt (+ (square (- (first v1) (first v2)))
-           (square (- (second v1) (second v2)))
-           (square (- (third v1) (third v2)))))
-  0.0))
-
 ;; Set up the initial conditions
 
 (set-property 'left-hand 'vertices (list (make-vertex -2 -1 0)
@@ -52,6 +45,9 @@
                                   (let* ((left-origin (car (get-property lh 'frame)))
                                          (right-origin (car (get-property rh 'frame)))
                                          (dis (distance left-origin right-origin)))
+                                    (pp left-origin)
+                                    (pp right-origin)
+                                    (pp dis)
                                     (min 1.0 (/ dis (get-value d)))))
                                  (else 0.0)))
                          (lambda (lh rh d)
@@ -59,8 +55,9 @@
                                   (rhof (get-property rh 'frame))
                                   (lhq (frame-quat lhof))
                                   (rhq (frame-quat rhof)))
-                             (list (list lh (list (list 'frame (make-frame (make-vertex -10 0 0) lhq))))
-                                   (list rh (list (list 'frame (make-frame (make-vertex 10 0 0) rhq)))))))))
+                             (make-binding-list
+                               (make-binding lh (list 'frame (make-frame (make-vertex -10 0 0) lhq)))
+                               (make-binding rh (list 'frame (make-frame (make-vertex 10 0 0) rhq))))))))
 
 (define hands-end-of-rung (make-basic-constraint
                             '(left-hand right-hand desired-closeness rung)
@@ -85,8 +82,9 @@
                                   (rhof (get-property rh 'frame))
                                   (lhq (frame-quat lhof))
                                   (rhq (frame-quat rhof)))
-                             (list (list lh (list (list 'frame (make-frame (make-vertex -10 0 0) lhq))))
-                                   (list rh (list (list 'frame (make-frame (make-vertex 10 0 0) rhq)))))))))
+                             (make-binding-list
+                               (make-binding lh (list 'frame (make-frame (make-vertex -10 0 0) lhq)))
+                               (make-binding rh (list 'frame (make-frame (make-vertex 10 0 0) rhq))))))))
 
 (define hands-on-ladder (make-compound-constraint
                           (list hands-far-away hands-end-of-rung)

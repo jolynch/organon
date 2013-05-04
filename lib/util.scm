@@ -32,3 +32,34 @@
 
 (define (assert expression)
   (if (not (expression)) (error (string-append "assertion failed for expression: " expression))))
+
+
+;; Bindings are of the form:
+;; ((property . value) (property . value) ...)
+;;
+;; Binding lists are of the form
+;; ((form . binding) (form . binding) ...
+;;
+
+(define (make-binding-list . bindings)
+  bindings)
+
+(define (make-property-binding property value)
+  (cons property value))
+
+(define (make-binding form . property-bindings)
+  (cons form
+        (list (map (lambda (pb) (make-property-binding (car pb) (cadr pb)))
+             property-bindings))))
+
+(define (bindings-for bindings form)
+  (assoc-get form bindings))
+
+(define (assoc-get object alist)
+  (let ((value (assoc object alist)))
+    (cond
+      ((eq? value #f) #f)
+      ((list? value) (cadr value))
+      ((pair? value) (cdr value))
+      (else #f))))
+
