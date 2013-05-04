@@ -11,6 +11,8 @@
 
 (declare-form-type 'basic (list 'value))
 
+(declare-form-type 'rungt (list 'left-rung 'right-rung 'radius))
+
 (define (get-value f)
   (get-property f 'value))
 

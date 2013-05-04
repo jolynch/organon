@@ -6,8 +6,6 @@
 (define (frame-vector f) (car f))
 (define (frame-quat f) (cadr f))
 
-
-
 ;; Vector convenience methods
 (define (distance v1 v2)
   (if (and (eq? (length v1) 3) (eq? (length v2) 3))
