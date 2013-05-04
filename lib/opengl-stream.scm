@@ -20,10 +20,12 @@
 (define connection '())
 
 (define (frame->packet frame)
-  "xyz(q1,q2,q3,q4)")
+  frame) 
+;; "xyz(q1,q2,q3,q4)")
 
 (define (vertices->packet vertex-list)
-  "(v1,v2,v3)(v4,v5,v6")
+  vertex-list)
+;;  "(v1,v2,v3)(v4,v5,v6")
 
 (define (form->packet form)
   ;; write out the frame, then the vertex lists
@@ -48,9 +50,9 @@
 (define (make-connection)
   (set! connection (open-tcp-stream-socket "localhost" port-number)))
 
-(pp "making connection")
-(make-connection)
-(pp "writing port")
-(write-forms (list 3220 32820 3282))
-(pp "closing port")
-(close-connection)
+;; (pp "making connection")
+;; (make-connection)
+;; (pp "writing port")
+;; (write-forms (list 3220 32820 3282))
+;; (pp "closing port")
+;; (close-connection)
