@@ -20,7 +20,7 @@
 
 (declare-form-type 'basic (list 'value))
 
-(declare-type-inherits '3D-rung '3D-form)
+(declare-type-inherits '3D-rung 'cylinder-form)
 (declare-form-type '3D-rung (list 'left-rung 'right-rung 'radius))
 
 (define (get-value f)
