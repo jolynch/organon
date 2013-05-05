@@ -15,8 +15,10 @@
                                          (make-vertex 0 1 0)
                                          (make-vertex 0 -1 0)))
 
+(set-property 'rung 'frame
+              (make-frame (make-vertex 0 0 0) (make-quaternion 0 0 0 1)))
 (set-property 'rung 'radius 1.0)
-(set-property 'rung 'width 10.0)
+(set-property 'rung 'length 10.0)
 
 (set-property 'left-hand 'frame
               (make-frame (make-vertex -1 0 1) (make-quaternion 0 0 0 1)))
@@ -136,8 +138,9 @@
 
 
 (pp "making connection")
-(make-connection "18.189.20.126" 1337)
-(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
+(make-connection "18.96.7.2" 1337)
+(write-forms '(rung))
+;;(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
 (close-connection)
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
