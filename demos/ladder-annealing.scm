@@ -131,7 +131,7 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-(basic-annealing-solver '(left-hand right-hand) (list hands-on-ladder))
+(basic-annealing-solver '(left-hand right-hand) (list hands-on-ladder) 20)
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 

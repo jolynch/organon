@@ -93,27 +93,43 @@
               (display "Bindings:")(pp-form form)(newline)
               (newline)) forms))
 
-(define (annealing-solver forms objective-constraints scoring-function temp)
-  (let* ( (root-bindings (map capture-bindings forms))
-          (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
-          (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
-          (all-hints (join-lists (map get-hints all-constraint-leaves)))
-          (converted-hints (filter (lambda (result) (not (null? result)))
-                                   (map
-                                     (lambda (hint)
-                                       (better-bindings (list hint)))
-                                     all-hints)))
-          (all-bindings (remove-dups converted-hints)))
+(define (annealing-solver o-forms objectives scoring temperature iterations)
+  (let ((best-binding (map capture-bindings o-forms))
+        (best-value (scoring)))
+    (define (solve forms objective-constraints scoring-function temp iter)
+      (let* ( (root-bindings (map capture-bindings forms))
+             (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
+             (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
+             (all-hints (join-lists (map get-hints all-constraint-leaves)))
+             (converted-hints (filter (lambda (result) (not (null? result)))
+                                      (map
+                                        (lambda (hint)
+                                          (better-bindings (list hint)))
+                                        all-hints)))
+             (all-bindings (remove-dups converted-hints)))
 
-    ;; generate the set of all possible subsets of hints, then compute their scores
-    (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
-      (apply-better-bindings chosen-bindings)
-      (if (> (scoring-function) .98)
-        (begin
-          (pp "Found solution state:")
-          (show-state forms)
-          (pp "Exiting\n ..."))
-        (annealing-solver forms objective-constraints scoring-function (* .9 temp))))))
+        ;; generate the set of all possible subsets of hints, then compute their scores
+        (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
+          (apply-better-bindings chosen-bindings)
+          (let ((score (scoring-function)))
+            (if (> score best-value)
+              (begin
+                (set! best-binding (map capture-bindings forms))
+                (set! best-value score)))
+            (cond
+              ((< iter 0)
+               (pp "Exceeded maximum iterations, best answer is:")
+               (apply-bindings forms best-binding)
+               (show-state forms)
+               (pp "Got as good as:")(display score))
+              ((> score .98)
+               (pp "Found solution state:")
+               (show-state forms)
+               (pp "Exiting\n ..."))
+              (else
+                (display "Trying again ")(write score)(display " is not good enough!")(newline)
+                (solve forms objective-constraints scoring-function (* .9 temp) (- iter 1))))))))
+      (solve o-forms objectives scoring temperature iterations)))
 
 
 
@@ -121,7 +137,6 @@
   (lambda () 
     (let* ( (scores (map (lambda (x) (x)) objective-constraints))
             (weights-and-scores (zip scores objective-constraint-weights)) )
-      (pp weights-and-scores)
       (apply + (map (lambda (x) (apply * x)) weights-and-scores))
       )))
 
@@ -134,12 +149,12 @@
   (iterative-solver forms objective-constraints 
                     (simple-scoring-func objective-constraints objective-constraint-weights)))
 
-(define (basic-annealing-solver forms objective-constraints)
+(define (basic-annealing-solver forms objective-constraints iterations)
   (pp "Initial state:")
   (show-state forms)
   (newline)
   (annealing-solver forms objective-constraints
-                    (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) .5))
+                    (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) .5 iterations))
 
 ;; we will have two initial solver implementations
 
