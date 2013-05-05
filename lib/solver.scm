@@ -31,8 +31,8 @@
 ;; TODO: convert to a set so we don't have duplicate leafs included
 (define (get-constraint-leaves objective-constraint) 
   (if (objective-constraint 'leaf?)
-      objective-constraint
-      (map get-constraint-leaves (objective-constraint 'children))))
+      (list objective-constraint)
+      (map (lambda (x) (car (get-constraint-leaves x))) (objective-constraint 'children))))
 
 (define (get-hints target-constraint)
   (target-constraint 'hint))
@@ -99,7 +99,7 @@
     (define (solve forms objective-constraints scoring-function temp iter)
       (let* ( (root-bindings (map capture-bindings forms))
              (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
-             (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
+             (all-constraint-leaves (car (listify (map get-constraint-leaves objective-constraints))))
              (all-hints (join-lists (map get-hints all-constraint-leaves)))
              (converted-hints (filter (lambda (result) (not (null? result)))
                                       (map
@@ -128,7 +128,7 @@
                (pp "Exiting\n ..."))
               (else
                 (display "Trying again ")(write score)(display " is not good enough!")(newline)
-                (solve forms objective-constraints scoring-function (* .9 temp) (- iter 1))))))))
+                (solve forms objective-constraints scoring-function (* .98 temp) (- iter 1))))))))
       (solve o-forms objectives scoring temperature iterations)))
 
 
@@ -154,7 +154,7 @@
   (show-state forms)
   (newline)
   (annealing-solver forms objective-constraints
-                    (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) .5 iterations))
+                    (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) 1 iterations))
 
 ;; we will have two initial solver implementations
 

@@ -3,7 +3,7 @@
 
 (declare-form 'left-hand '3D-hand-form)
 (declare-form 'right-hand '3D-hand-form)
-(declare-form 'rung 'rungt)
+(declare-form 'rung '3D-rung)
 (declare-form 'desired-distance 'basic)
 (declare-form 'desired-closeness 'basic)
 (declare-form 'axis 'basic)
@@ -81,7 +81,7 @@
         ((and (is-type? left-hand '3D-hand-form)
               (is-type? right-hand '3D-hand-form)
               (is-type? d 'basic)
-              (is-type? rung 'rungt))
+              (is-type? rung '3D-rung))
          (let* ((left-origin (car (get-property left-hand 'frame)))
                 (right-origin (car (get-property right-hand 'frame)))
                 (left-rung (get-property rung 'left-rung))
@@ -131,7 +131,7 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-(basic-annealing-solver '(left-hand right-hand) (list hands-on-ladder) 20)
+(basic-annealing-solver '(left-hand right-hand) (list hands-on-ladder) 100)
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 
