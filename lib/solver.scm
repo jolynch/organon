@@ -1,4 +1,4 @@
-(define *solver-debug* #t)
+(define *solver-debug* #f)
 
 ;; pretty print debug
 (define (ppd . x) (if (or *debug* *solver-debug*) (apply pp x)))
@@ -11,7 +11,7 @@
 ;; if needed, will occur at the constraint level.
 
 ;; TODO: document me
-(define (iteratively-score-hints list-of-hints scoring-function)
+(define (iteratively-score-hints list-of-hints scoring-function visualizer-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
   (ppds "list-of-hints is ") (ppd list-of-hints)
   (map (lambda (form-bindings-pair)
@@ -21,6 +21,7 @@
         (ppds "examining form: ") (ppd form)
         (apply-bindings form bindings)
         (display "bound form: ") (display form) (pp-form form) (newline)
+        (visualizer-function)
         (scoring-function)
       )
     ) list-of-hints))
@@ -38,6 +39,9 @@
 
 (define (join-lists list-of-lists)
   (fold-right (lambda (a b) (append a b)) '() list-of-lists))
+
+(define (network-visualizer all-forms)
+  (write-forms all-forms))
 
 ;; iterate recursively over the objective constraints, descending into their
 ;; children (not implemented yet) and calling the hint-iterator on each of them
@@ -57,7 +61,8 @@
 
             (accumulated-hint-scores (map (lambda (hint-subset)
                                             (restore-root-bindings)
-                                            (iteratively-score-hints hint-subset scoring-function)
+                                            (iteratively-score-hints hint-subset scoring-function 
+                                              (lambda () (network-visualizer forms)))
                                             ) all-hints-subsets)) )
       (restore-root-bindings)
       (pp accumulated-hint-scores)

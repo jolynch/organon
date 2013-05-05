@@ -11,7 +11,8 @@
 
 (declare-form-type 'basic (list 'value))
 
-(declare-form-type 'rungt (list 'left-rung 'right-rung 'radius))
+(declare-type-inherits '3D-rung '3D-form)
+(declare-form-type '3D-rung (list 'left-rung 'right-rung 'radius))
 
 (define (get-value f)
   (get-property f 'value))

@@ -31,12 +31,12 @@
   ;; write out the frame, then the vertex lists
   (assert (lambda () is-type? form '3D-form))
   (let ( (frame (get-property form 'frame)) (vertex-list (get-property form 'vertices)) )
-      (string-append "(" (frame->packet frame) (vertices->packet vertex-list) ")")
+    (string-append "(" (frame->packet frame) (vertices->packet vertex-list) ")")
   ))
 
 (define (forms->packet forms)
   (assert (lambda () (not (null? connection))))
-  (string-append (fold-right string-append "" (map form->packet forms)) clear-screen-marker))
+  (string-append clear-screen-marker (fold-right string-append "" (map form->packet forms))))
 
 (define (write-clear-screen)
   (write-line clear-screen-marker connection))
