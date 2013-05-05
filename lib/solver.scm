@@ -82,6 +82,12 @@
       (set-property (first binding) (second binding) (third binding)))
     chosen-bindings))
 
+(define (show-state forms)
+  (for-each (lambda (form)
+              (display "Form: ")(write form)(newline)
+              (display "Bindings:")(pp-form form)(newline)
+              (newline)) forms))
+
 (define (annealing-solver forms objective-constraints scoring-function temp)
   (let* ( (root-bindings (map capture-bindings forms))
           (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
@@ -100,8 +106,8 @@
       (if (> (scoring-function) .98)
         (begin
           (pp "Found solution state:")
-            (for-each pp-form forms)
-            (pp "Exiting\n ..."))
+          (show-state forms)
+          (pp "Exiting\n ..."))
         (annealing-solver forms objective-constraints scoring-function (* .9 temp))))))
 
 
@@ -124,6 +130,9 @@
                     (simple-scoring-func objective-constraints objective-constraint-weights)))
 
 (define (basic-annealing-solver forms objective-constraints)
+  (pp "Initial state:")
+  (show-state forms)
+  (newline)
   (annealing-solver forms objective-constraints
                     (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) .5))
 
