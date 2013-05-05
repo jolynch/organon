@@ -3,13 +3,13 @@
 ;; ================================================================================
 (declare-form-type '3D-form (list 'frame 'vertices))
 
-(declare-type-inherits '3D-form 'cylinder-form)
+(declare-type-inherits 'cylinder-form '3D-form)
 (declare-form-type 'cylinder-form (list 'cylinder-length 'cylinder-radius))
 
-(declare-type-inherits '3D-form 'box-form)
+(declare-type-inherits 'box-form '3D-form)
 (declare-form-type 'cylinder-form (list 'box-height 'box-width 'box-length))
 
-(declare-type-inherits '3D-form 'sphere-form)
+(declare-type-inherits 'sphere-form '3D-form)
 (declare-form-type 'cylinder-form (list 'sphere-radius))
 
 (declare-type-inherits 'hand-form '3D-form)
