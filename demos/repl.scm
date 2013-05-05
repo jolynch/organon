@@ -2,7 +2,8 @@
   (list
     (cons 'ladder "ladder.scm")
     (cons 'ladder-annealing "ladder-annealing.scm")
-    (cons 'big-bang "big-bang.scm")))
+    (cons 'big-bang "big-bang.scm")
+    (cons 'laffer "laffer.scm")))
 
 (define (display-demos)
   (pp demos))
