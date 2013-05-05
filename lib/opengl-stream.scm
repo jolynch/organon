@@ -69,4 +69,4 @@
   (close-port connection))
 
 (define (make-connection)
-  (set! connection (open-tcp-stream-socket hostname port)))
+  (set! connection (open-tcp-stream-socket hostname port-number)))

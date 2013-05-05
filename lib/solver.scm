@@ -88,7 +88,6 @@
     chosen-bindings))
 
 (define (show-state forms)
-  (network-visualizer forms)
   (for-each (lambda (form)
               (display "Form: ")(write form)(newline)
              (display "Bindings:")(pp-form form)(newline)
@@ -112,6 +111,7 @@
         ;; generate the set of all possible subsets of hints, then compute their scores
         (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
           (apply-better-bindings chosen-bindings)
+          (network-visualizer forms)
           (let ((score (scoring-function)))
             (if (> score best-value)
               (begin
