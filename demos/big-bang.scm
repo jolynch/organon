@@ -1,3 +1,4 @@
+(define *use-network-visualizer* #t)
 (define *demo-debug* #t)
 (define *debug* #f)
 
@@ -53,14 +54,14 @@
     universe-constraint
     universe-hint))
 
-(pp "making connection")
-(make-connection)
+
+(if *use-network-visualizer* (begin (pp "making connection") (make-connection)))
 
 (basic-annealing-solver (map (lambda (i) (symbol 'star- i)) (range 0 100))
                         (list universe-exploded)
                         100)
 
-(close-connection)
+(if *use-network-visualizer* (close-connection))
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 

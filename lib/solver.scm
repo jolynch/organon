@@ -41,7 +41,8 @@
   (fold-right (lambda (a b) (append a b)) '() list-of-lists))
 
 (define (network-visualizer all-forms)
-  (write-forms all-forms))
+  (if *use-network-visualizer* 
+      (write-forms all-forms)))
 
 ;; iterate recursively over the objective constraints, descending into their
 ;; children (not implemented yet) and calling the hint-iterator on each of them
@@ -124,7 +125,7 @@
                (show-state forms)
                (pp "Got as good as:")(display score))
               ((> score .98)
-               (pp "Found solution state:")
+               (pp "Found solution state:")(display score)
                (show-state forms)
                (pp "Exiting\n ..."))
               (else

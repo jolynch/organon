@@ -136,11 +136,12 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-(pp "making connection")
-(make-connection)
-(write-forms '(rung))
-;;(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
-(close-connection)
+
+(if *use-network-visualizer* (begin (pp "making connection") (make-connection)))
+
+(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
+
+(if *use-network-visualizer* (close-connection))
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 
