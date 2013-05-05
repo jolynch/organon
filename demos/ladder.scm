@@ -3,7 +3,7 @@
 
 (declare-form 'left-hand '3D-hand-form)
 (declare-form 'right-hand '3D-hand-form)
-(declare-form 'rung 'rungt)
+(declare-form 'rung 'cylinder-form)
 (declare-form 'desired-distance 'basic)
 (declare-form 'desired-closeness 'basic)
 (declare-form 'axis 'basic)
@@ -11,20 +11,23 @@
 ;; Set up the initial conditions
 
 (set-property 'left-hand 'vertices (list (make-vertex -2 -1 0)
-                                         (make-vertex -2 1 1)
-                                         (make-vertex 0 -1 0)
-                                         (make-vertex 0 1 0)))
+                                         (make-vertex -2 1 0)
+                                         (make-vertex 0 1 0)
+                                         (make-vertex 0 -1 0)))
+
+(set-property 'rung 'radius 1.0)
+(set-property 'rung 'width 10.0)
 
 (set-property 'left-hand 'frame
-              (make-frame (make-vertex -1 0 0) (make-quaternion 0 0 0 1)))
+              (make-frame (make-vertex -1 0 1) (make-quaternion 0 0 0 1)))
 
 (set-property 'right-hand 'vertices (list (make-vertex 2 -1 0)
-                                          (make-vertex 2 1 1)
-                                          (make-vertex 0 -1 0)
-                                          (make-vertex 0 1 0)))
+                                          (make-vertex 2 1 0)
+                                          (make-vertex 0 1 0)
+                                          (make-vertex 0 -1 0)))
 
 (set-property 'right-hand 'frame
-              (make-frame (make-vertex 1 0 0) (make-quaternion 0 0 0 1)))
+              (make-frame (make-vertex 1 0 1) (make-quaternion 0 0 0 1)))
 
 (set-property 'rung 'left-rung (make-vertex -10 0 0))
 (set-property 'rung 'right-rung (make-vertex 10 0 0))
@@ -81,7 +84,7 @@
         ((and (is-type? left-hand '3D-hand-form)
               (is-type? right-hand '3D-hand-form)
               (is-type? d 'basic)
-              (is-type? rung 'rungt))
+              (is-type? rung 'cylinder-form))
          (let* ((left-origin (car (get-property left-hand 'frame)))
                 (right-origin (car (get-property right-hand 'frame)))
                 (left-rung (get-property rung 'left-rung))
@@ -104,8 +107,8 @@
              (right-hand-vector  (frame-vector right-hand-old))
              (left-hand-rung  (get-property rung 'left-rung))
              (right-hand-rung  (get-property rung 'right-rung))
-             (left-hand-goal  (interpolate left-hand-vector left-hand-rung 4))
-             (right-hand-goal  (interpolate right-hand-vector right-hand-rung 4))
+             (left-hand-goal  (interpolate left-hand-vector left-hand-rung 2))
+             (right-hand-goal  (interpolate right-hand-vector right-hand-rung 2))
              (left-hand-goal-frame
                (map (lambda (goal)
                       (list 'frame (make-frame goal left-hand-quat))) left-hand-goal))
@@ -131,7 +134,11 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
+
+(pp "making connection")
+(make-connection "18.189.20.126" 1337)
 (basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
+(close-connection)
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 
