@@ -91,8 +91,7 @@
 (define (show-state forms)
   (for-each (lambda (form)
               (display "Form: ")(write form)(newline)
-             (display "Bindings:")(pp-form form)(newline)
-              (newline)) forms))
+             (display "Bindings:")(pp-form form)) forms))
 
 (define (annealing-solver o-forms objectives scoring temperature iterations)
   (let ((best-binding (map capture-bindings o-forms))
@@ -129,8 +128,9 @@
                (show-state forms)
                (pp "Exiting\n ..."))
               (else
-                (display "Trying again ")(write score)(display " is not good enough!")(newline)
-                (solve forms objective-constraints scoring-function (* .98 temp) (- iter 1))))))))
+                (display "Trying again ")(write score)(display " is not good enough! with temp ")
+                (write temp)(newline)
+                (solve forms objective-constraints scoring-function (* .9999 temp) (- iter 1))))))))
       (solve o-forms objectives scoring temperature iterations)))
 
 
@@ -157,6 +157,13 @@
   (newline)
   (annealing-solver forms objective-constraints
                     (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) 1 iterations))
+
+(define (weighted-annealing-solver forms objective-constraints objective-constraint-weights iterations)
+  (pp "Initial state:")
+  (show-state forms)
+  (newline)
+  (annealing-solver forms objective-constraints
+                    (simple-scoring-func objective-constraints objective-constraint-weights) 1 iterations))
 
 ;; we will have two initial solver implementations
 
