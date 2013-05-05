@@ -1,6 +1,7 @@
 (define demos
   (list
-    (cons 'ladder "ladder.scm")))
+    (cons 'ladder "ladder.scm")
+    (cons 'ladder-annealing "ladder-annealing.scm")))
 
 (define (display-demos)
   (pp demos))

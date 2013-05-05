@@ -46,14 +46,15 @@
   (let* ( (root-bindings (map capture-bindings forms))
           (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
           (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
-          (all-hints (join-lists (map get-hints all-constraint-leaves))) )
+          (all-hints (join-lists (map get-hints all-constraint-leaves))))
 
     (display "all-constraint-leaves ") (pp all-constraint-leaves)
     (display "all hints") (pp all-hints)
     (display "all susbsets of hints") (pp (non-empty-subsets all-hints))
 
     ;; generate the set of all possible subsets of hints, then compute their scores
-    (let* ( (all-hints-subsets (non-empty-subsets all-hints)) 
+    (let* ((all-hints-subsets (non-empty-subsets all-hints))
+
             (accumulated-hint-scores (map (lambda (hint-subset)
                                             (restore-root-bindings)
                                             (iteratively-score-hints hint-subset scoring-function)
@@ -61,6 +62,49 @@
       (restore-root-bindings)
       (pp accumulated-hint-scores)
   )))
+
+(define (anneal-choose hints iteration prob)
+  (let ((chosen-hints
+          (let loop ((result '())
+                     (remaining hints))
+            (if (null? remaining) result
+              (let ((value (car remaining)))
+                (if (< (random 1.0) prob)
+                  (loop (cons value result) (cdr remaining))
+                  (loop result (cdr remaining))))))))
+    (better-bindings chosen-hints)))
+
+;; Takes bindings of the form
+;; (form property value) ...
+(define (apply-better-bindings chosen-bindings)
+  (for-each
+    (lambda (binding)
+      (set-property (first binding) (second binding) (third binding)))
+    chosen-bindings))
+
+(define (annealing-solver forms objective-constraints scoring-function temp)
+  (let* ( (root-bindings (map capture-bindings forms))
+          (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
+          (all-constraint-leaves (car (map get-constraint-leaves objective-constraints)))
+          (all-hints (join-lists (map get-hints all-constraint-leaves)))
+          (converted-hints (filter (lambda (result) (not (null? result)))
+                                   (map
+                                     (lambda (hint)
+                                       (better-bindings (list hint)))
+                                     all-hints)))
+          (all-bindings (remove-dups converted-hints)))
+
+    ;; generate the set of all possible subsets of hints, then compute their scores
+    (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
+      (apply-better-bindings chosen-bindings)
+      (if (> (scoring-function) .98)
+        (begin
+          (pp "Found solution state:")
+            (for-each pp-form forms)
+            (pp "Exiting\n ..."))
+        (annealing-solver forms objective-constraints scoring-function (* .9 temp))))))
+
+
 
 (define (simple-scoring-func objective-constraints objective-constraint-weights )
   (lambda () 
@@ -78,6 +122,10 @@
 (define (weighted-iterative-solver forms objective-constraint objective-constraint-weights)
   (iterative-solver forms objective-constraints 
                     (simple-scoring-func objective-constraints objective-constraint-weights)))
+
+(define (basic-annealing-solver forms objective-constraints)
+  (annealing-solver forms objective-constraints
+                    (simple-scoring-func objective-constraints (make-list (length objective-constraints) 1)) .5))
 
 ;; we will have two initial solver implementations
 

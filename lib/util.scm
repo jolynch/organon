@@ -55,6 +55,12 @@
 (define (bindings-for bindings form)
   (assoc-get form bindings))
 
+(define (binding-form binding)
+  (car binding))
+
+(define (binding-properties binding)
+  (sort (map car (cadr binding)) symbol<?))
+
 (define (assoc-get object alist)
   (let ((value (assoc object alist)))
     (cond
@@ -63,3 +69,43 @@
       ((pair? value) (cdr value))
       (else #f))))
 
+(define (better-bindings bindings)
+  (remove-duplicates (convert-bindings bindings)))
+
+;; Takes a list of bindings and converts them to a list of
+;; (form property value)
+(define (convert-bindings bindings)
+  (map
+    (lambda (triple)
+      (list (car triple) (cadr triple) (cddr triple)))
+    (join-lists (map
+                  (lambda (binding)
+                    (map (lambda (var) (cons (binding-form binding) var))
+                         (cadr binding))) bindings))))
+
+;; Says if a particular form, property  is present in a given list of triples
+(define (fp-present? lst form property)
+  (if (null? lst) #f
+    (let ((item (car lst)))
+      (or (and (equal? (car item) form)
+               (equal? (cadr item) property))
+          (fp-present? (cdr lst) form property)))))
+
+;; Remove duplicate assignments
+(define (remove-duplicates triples)
+  (let accum ((result '())
+              (remaining triples))
+    (if (null? remaining) result
+      (let ((value (car remaining)))
+        (if (fp-present? result (car value) (cadr value))
+          (accum result (cdr remaining))
+          (accum (cons value result) (cdr remaining)))))))
+
+(define (remove-dups lst)
+  (let accum ((result '())
+              (remaining lst))
+    (if (null? remaining) result
+      (let ((value (car remaining)))
+        (if (member value result)
+          (accum result (cdr remaining))
+          (accum (cons value result) (cdr remaining)))))))

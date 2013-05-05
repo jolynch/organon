@@ -56,12 +56,14 @@
 (define (unit v1)
   (scale-vector v1 (/ 1.0 (mag v1))))
 
-(define (interpolate v1 v2 num)
-  (let* ((direction (sub-vector v2 v1))
-         (udir (unit direction))
-         (scale (/ (distance v1 v2) (- num 1))))
-    (map (lambda (n)
-           (add-vector v1 (scale-vector udir (* n scale))))
-         (range 0 num))))
+(define (interpolate x y n)
+  (define (fake-inter v1 v2 num)
+    (let* ((direction (sub-vector v2 v1))
+           (udir (unit direction))
+           (scale (/ (distance v1 v2) (- num 1))))
+      (map (lambda (n)
+             (add-vector v1 (scale-vector udir (* n scale))))
+           (range 0 num))))
+  (reverse (cdr (reverse (cdr (fake-inter x y (+ 2 n)))))))
 
 
