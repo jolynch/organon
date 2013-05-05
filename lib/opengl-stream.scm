@@ -31,7 +31,7 @@
   ;; write out the frame, then the vertex lists
   (assert (lambda () is-type? form '3D-form))
 
-  (let ( (frame (get-property form 'frame)) (vertex-list (get-property form 'vertices)) 
+  (let* ( (frame (get-property form 'frame)) (vertex-list (get-property form 'vertices)) 
          (packet (cond ( (is-type? form 'cylinder-form)
                          (write-to-string (list (list "cylinder") 
                                                 (list (get-property form 'radius)
