@@ -26,6 +26,7 @@
 (define (get-value f)
   (get-property f 'value))
 
+(declare-type-inherits 'star '3D-form)
 (declare-form-type 'star (list 'center 'radius))
 
 ;; ================================================================================

@@ -16,12 +16,12 @@
                                          (make-vertex 0 -1 0)))
 
 (set-property 'rung 'frame
-              (make-frame (make-vertex 0 0 0) (make-quaternion 0 0 0 1)))
+              (make-frame (make-vertex 0 0 0) (make-identity-quaternion)))
 (set-property 'rung 'radius 1.0)
 (set-property 'rung 'length 10.0)
 
 (set-property 'left-hand 'frame
-              (make-frame (make-vertex -1 0 1) (make-quaternion 0 0 0 1)))
+              (make-frame (make-vertex -1 0 1) (make-identity-quaternion)))
 
 (set-property 'right-hand 'vertices (list (make-vertex 2 -1 0)
                                           (make-vertex 2 1 0)
@@ -29,7 +29,7 @@
                                           (make-vertex 0 -1 0)))
 
 (set-property 'right-hand 'frame
-              (make-frame (make-vertex 1 0 1) (make-quaternion 0 0 0 1)))
+              (make-frame (make-vertex 1 0 1) (make-identity-quaternion)))
 
 (set-property 'rung 'left-rung (make-vertex -10 0 0))
 (set-property 'rung 'right-rung (make-vertex 10 0 0))
@@ -136,9 +136,8 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-
 (pp "making connection")
-(make-connection "18.96.7.2" 1337)
+(make-connection)
 (write-forms '(rung))
 ;;(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
 (close-connection)

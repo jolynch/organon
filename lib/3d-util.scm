@@ -2,6 +2,7 @@
 (define (make-vector x y z) (list x y z))
 (define make-vertex make-vector)
 (define (make-quaternion q1 q2 q3 q4) (list q1 q2 q3 q4))
+(define (make-identity-quaternion) (make-quaternion 0 0 0 1))
 (define (make-frame vector quaternion) (list vector quaternion))
 (define (frame-vector f) (car f))
 (define (frame-quat f) (cadr f))

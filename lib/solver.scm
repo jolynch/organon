@@ -88,9 +88,10 @@
     chosen-bindings))
 
 (define (show-state forms)
+  (network-visualizer forms)
   (for-each (lambda (form)
               (display "Form: ")(write form)(newline)
-              (display "Bindings:")(pp-form form)(newline)
+             (display "Bindings:")(pp-form form)(newline)
               (newline)) forms))
 
 (define (annealing-solver o-forms objectives scoring temperature iterations)

@@ -53,9 +53,14 @@
     universe-constraint
     universe-hint))
 
+(pp "making connection")
+(make-connection)
+
 (basic-annealing-solver (map (lambda (i) (symbol 'star- i)) (range 0 100))
                         (list universe-exploded)
                         100)
+
+(close-connection)
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 
