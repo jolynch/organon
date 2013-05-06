@@ -1,9 +1,10 @@
 (define *demo-debug* #t)
 (define *debug* #f)
+(define *use-network-visualizer* #t)
 
 (declare-form 'left-hand '3D-hand-form)
 (declare-form 'right-hand '3D-hand-form)
-(declare-form 'rung 'cylinder-form)
+(declare-form 'rung '3D-rung)
 (declare-form 'desired-distance 'basic)
 (declare-form 'desired-closeness 'basic)
 (declare-form 'axis 'basic)
@@ -14,11 +15,6 @@
                                          (make-vertex -2 1 0)
                                          (make-vertex 0 1 0)
                                          (make-vertex 0 -1 0)))
-
-(set-property 'rung 'frame
-              (make-frame (make-vertex 0 0 0) (make-identity-quaternion)))
-(set-property 'rung 'radius 1.0)
-(set-property 'rung 'length 10.0)
 
 (set-property 'left-hand 'frame
               (make-frame (make-vertex -1 0 1) (make-identity-quaternion)))
@@ -31,8 +27,11 @@
 (set-property 'right-hand 'frame
               (make-frame (make-vertex 1 0 1) (make-identity-quaternion)))
 
+(set-property 'rung 'frame
+              (make-frame (make-vertex 0 0 0) (make-quaternion 0 0.707 0 0.707)))
 (set-property 'rung 'left-rung (make-vertex -10 0 0))
 (set-property 'rung 'right-rung (make-vertex 10 0 0))
+(set-property 'rung 'length 20.0)
 (set-property 'rung 'radius 1.0)
 
 (set-property 'desired-distance 'value 5)
@@ -139,7 +138,7 @@
 
 (if *use-network-visualizer* (begin (pp "making connection") (make-connection)))
 
-(basic-iterative-solver '(left-hand right-hand) (list hands-on-ladder))
+(basic-iterative-solver '(rung left-hand right-hand) (list hands-on-ladder))
 
 (if *use-network-visualizer* (close-connection))
 

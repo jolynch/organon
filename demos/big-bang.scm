@@ -2,13 +2,15 @@
 (define *demo-debug* #t)
 (define *debug* #f)
 
-(for-each (lambda (i) (declare-form (symbol 'star- i) 'star)) (range 0 100))
-
 (declare-form 'desired-distance 'basic)
+(set-property 'desired-distance 'value 10)
+
+(for-each (lambda (i) (declare-form (symbol 'star- i) 'star)) (range 0 100))
+(declare-form 'goal-star 'star)
+(set-property 'goal-star 'center (make-vertex 0 0 0))
+(set-property 'goal-star 'radius (get-value 'desired-distance))
 
 ;; Set up the initial conditions
-
-(set-property 'desired-distance 'value 10)
 
 (for-each (lambda (i)
             (set-property (symbol 'star- i) 'radius 1)) (range 0 100))
@@ -57,7 +59,7 @@
 
 (if *use-network-visualizer* (begin (pp "making connection") (make-connection)))
 
-(basic-annealing-solver (map (lambda (i) (symbol 'star- i)) (range 0 100))
+(basic-annealing-solver (cons 'goal-star (map (lambda (i) (symbol 'star- i)) (range 0 100)))
                         (list universe-exploded)
                         100)
 

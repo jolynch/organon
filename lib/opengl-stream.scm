@@ -14,7 +14,7 @@
 ;; When you're done
 
 ;; (load "util")
-(define hostname "18.96.7.2")
+(define hostname "128.30.31.85")
 (define port-number 1337)
 
 (define clear-screen-marker "(CLS)")

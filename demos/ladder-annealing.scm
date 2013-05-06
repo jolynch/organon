@@ -13,22 +13,25 @@
 
 (set-property 'left-hand 'vertices (list (make-vertex -2 -1 0)
                                          (make-vertex -2 1 1)
-                                         (make-vertex 0 -1 0)
-                                         (make-vertex 0 1 0)))
+                                         (make-vertex 0 1 0)
+                                         (make-vertex 0 -1 0)))
 
 (set-property 'left-hand 'frame
               (make-frame (make-vertex -1 -8 -3) (make-quaternion 0 0 0 1)))
 
 (set-property 'right-hand 'vertices (list (make-vertex 2 -1 0)
                                           (make-vertex 2 1 1)
-                                          (make-vertex 0 -1 0)
-                                          (make-vertex 0 1 0)))
+                                          (make-vertex 0 1 0)
+                                          (make-vertex 0 -1 0)))
 
 (set-property 'right-hand 'frame
               (make-frame (make-vertex -1 -4 -1) (make-quaternion 0 0 0 1)))
 
 (set-property 'rung 'left-rung (make-vertex -10 0 0))
 (set-property 'rung 'right-rung (make-vertex 10 0 0))
+(set-property 'rung 'frame
+              (make-frame (make-vertex 0 0 0) (make-quaternion 0 0.707 0 0.707)))
+(set-property 'rung 'length 20.0)
 (set-property 'rung 'radius 1.0)
 
 (set-property 'desired-distance 'value 5)
@@ -132,7 +135,11 @@
 
 (pp "Final hands-on-ladder value:")(write (hands-on-ladder))(newline)
 
-(basic-annealing-solver '(left-hand right-hand) (list hands-on-ladder) 100)
+(if *use-network-visualizer* (begin (pp "making connection") (make-connection)))
+
+(basic-annealing-solver '(rung left-hand right-hand) (list hands-on-ladder) 100)
+
+(if *use-network-visualizer* (close-connection))
 
 ;;(iterative-solver '(left-hand right-hand) '(hands-on-ladder))
 
