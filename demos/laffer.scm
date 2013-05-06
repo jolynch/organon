@@ -23,11 +23,11 @@
 ;; constraint returns a value in range [0.0, 1.0] is (revenue at tax-rate /
 ;; maximum possible revenue)
 (define (laffer-constraint tax-rate . taxpayers)
-  (pp "at tax rate ") (pp (get-value tax-rate))
   (/ (fold-right + 0 (map (lambda (ith-taxpayer) 
                             (* (* (- 1.0 (expt (get-value tax-rate) (get-property ith-taxpayer 'liberalness)) )
                                      (get-property ith-taxpayer 'max-hours-worked))
-                                  (get-property ith-taxpayer 'hourly-wage))
+                                  (get-property ith-taxpayer 'hourly-wage)
+                                  (get-value tax-rate))
                          ) taxpayers))
      (fold-right + 0 (map (lambda (ith-taxpayer) (* (get-property ith-taxpayer 'max-hours-worked)
                                                (get-property ith-taxpayer 'hourly-wage))) taxpayers))))
@@ -39,7 +39,7 @@
 
 ;; four hints: + tax rate, - tax rate, + max-hours-worked, - max-hours-worked
 (define (laffer-hint tax-rate . taxypayers)
-  (make-binding-list (make-binding tax-rate (list 'value (- (get-value tax-rate) 0.01))))
+  (make-binding-list (make-binding tax-rate (list 'value (max 0.01 (- (get-value tax-rate) 0.01)))))
 ;;  (make-binding-list (make-binding ith-taxpayer (list 'max-hours-worked ...
   )
 
@@ -54,7 +54,7 @@
 ;;(iterative-solver (map (lambda (i) (symbol 'taxpayer- i)) (range 0 num-taxpayers)) (list laffer-curve))
 
 ;; maximimize govt revenue as a percentage of GDP
-(basic-annealing-solver (map (lambda (i) (symbol 'taxpayer- i)) (range 0 num-taxpayers)) (list laffer-curve) 1000)
+(basic-annealing-solver (cons 'govt-tax-rate (map (lambda (i) (symbol 'taxpayer- i)) (range 0 num-taxpayers))) (list laffer-curve) 100)
 
 (display "tax rate settled at ")
 (pp (get-value 'govt-tax-rate))

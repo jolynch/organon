@@ -94,44 +94,47 @@
              (display "Bindings:")(pp-form form)) forms))
 
 (define (annealing-solver o-forms objectives scoring temperature iterations)
-  (let ((best-binding (map capture-bindings o-forms))
-        (best-value (scoring)))
-    (define (solve forms objective-constraints scoring-function temp iter)
-      (let* ( (root-bindings (map capture-bindings forms))
-             (restore-root-bindings (lambda () (apply-bindings forms root-bindings)))
-             (all-constraint-leaves (car (listify (map get-constraint-leaves objective-constraints))))
-             (all-hints (join-lists (map get-hints all-constraint-leaves)))
-             (converted-hints (filter (lambda (result) (not (null? result)))
-                                      (map
-                                        (lambda (hint)
-                                          (better-bindings (list hint)))
-                                        all-hints)))
-             (all-bindings (remove-dups converted-hints)))
-
-        ;; generate the set of all possible subsets of hints, then compute their scores
-        (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
-          (apply-better-bindings chosen-bindings)
-          (network-visualizer forms)
-          (let ((score (scoring-function)))
-            (if (> score best-value)
-              (begin
-                (set! best-binding (map capture-bindings forms))
-                (set! best-value score)))
-            (cond
-              ((< iter 0)
-               (pp "Exceeded maximum iterations, best answer is:")
-               (apply-bindings forms best-binding)
-               (show-state forms)
-               (pp "Got as good as:")(display score))
-              ((> score .98)
-               (pp "Found solution state:")(display score)
-               (show-state forms)
-               (pp "Exiting\n ..."))
-              (else
-                (display "Trying again ")(write score)(display " is not good enough! with temp ")
-                (write temp)(newline)
-                (solve forms objective-constraints scoring-function (* .9999 temp) (- iter 1))))))))
-      (solve o-forms objectives scoring temperature iterations)))
+  (let solve ((best-binding (map capture-bindings o-forms))
+              (best-value (scoring))
+              (forms o-forms)
+              (objective-constraints objectives)
+              (scoring-function scoring)
+              (temp temperature)
+              (iter iterations))
+    (let* ((all-constraint-leaves (car (listify (map get-constraint-leaves objective-constraints))))
+           (all-hints (join-lists (map get-hints all-constraint-leaves)))
+           (converted-hints (filter (lambda (result) (not (null? result)))
+                                    (map (lambda (hint)
+                                           (better-bindings (list hint)))
+                                         all-hints)))
+           (all-bindings (remove-dups converted-hints)))
+      ;; generate the set of all possible subsets of hints, then compute their scores
+      (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
+        (apply-better-bindings chosen-bindings)
+        (network-visualizer forms)
+        (let ((score (scoring-function)))
+          (cond
+            ((< iter 0)
+             (pp "Exceeded maximum iterations, best answer is:")
+             (for-each (lambda (binding)
+                         (apply-bindings (car binding) (cdr binding)))
+                       best-binding)
+             (show-state forms)
+             (display "Got top score: ")(display best-value)(newline))
+            ((> score .98)
+             (pp "Found solution state:")(display score)
+             (show-state forms))
+            (else
+              (display "Trying again ")(write score)(display " is not good enough! with temp ")
+              (write temp)(newline)
+              (if (> score best-value)
+                (begin
+                (solve (map (lambda (form) (cons form (tree-copy (capture-bindings form)))) forms)
+                       score
+                       forms objective-constraints scoring-function (* .9999 temp) (- iter 1)))
+                (solve best-binding
+                       best-value
+                       forms objective-constraints scoring-function (* .9999 temp) (- iter 1))))))))))
 
 
 

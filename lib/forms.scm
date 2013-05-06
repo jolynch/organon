@@ -14,7 +14,8 @@
   (eq-plist-simple form))
 
 (define (apply-bindings form bindings)
-  (for-each (lambda (binding) (set-property form (car binding) (cdr binding))) bindings))
+  (for-each (lambda (binding)
+              (set-property form (car binding) (cdr binding))) bindings))
 
 (define (same-type? form-a form-b)
   (equal? (eq-ordered-plist form-a) (eq-ordered-plist form-b)))
