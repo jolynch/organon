@@ -109,3 +109,9 @@
         (if (member value result)
           (accum result (cdr remaining))
           (accum (cons value result) (cdr remaining)))))))
+
+
+;; Take a random choice from a list
+(define (random-choice lst)
+  (let ((v (list->vector lst)))
+    (vector-ref v (random (length lst)))))
