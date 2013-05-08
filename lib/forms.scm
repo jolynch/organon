@@ -5,9 +5,10 @@
   (eq-get form property))
 
 ;; TODO - decide whether to convert this to a continuation form rather than calling update-form immediately
-(define (set-property form property value)
+(define (set-property form property value #!optional update)
   (let ((val (eq-put! form property value)))
-    (update-form form)
+    (if (default-object? update)
+      (update-form form))
     val))
 
 (define (capture-bindings form)

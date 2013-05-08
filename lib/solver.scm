@@ -122,7 +122,9 @@
              (show-state forms)
              (display "Got top score: ")(display best-value)(newline))
             ((> score .98)
-             (pp "Found solution state:")(display score)
+             (display "Found solution state with score |")
+             (display score)(display "| after #")(display (- iterations iter))
+             (display " iterations.")(newline)
              (show-state forms))
             (else
               (display "Trying again ")(write score)(display " is not good enough! with temp ")

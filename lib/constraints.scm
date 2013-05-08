@@ -2,11 +2,10 @@
 
 ;; Mapping of forms to dependent constraints
 (define *forms* (make-eq-hash-table))
-
 ;; Mapping of constrains to dependent constraints
 (define *constraints* (make-eq-hash-table))
 
-;; Convenience methods to deal with entity state
+;; Convenience methods to deal with constraint entity state
 (define (dirty? entity)
   (eq? (car (entity-extra entity)) 'dirty))
 
@@ -30,7 +29,7 @@
     (propagate-to constraint constraints)))
 
 ;; Actually call the dependent constraints
-;; will need to pass list of calling dependencies to detect loops
+;; TODO: pass list of calling dependencies to detect loops
 (define (propagate-to orig-constraint constraints)
   (if constraints
     (for-each (lambda (constraint)
@@ -65,6 +64,18 @@
 ;;
 ;; (constraint 'children) -> Returns a list of the constraints that are
 ;; children of this constraint
+;;
+;; (constraint 'eval arg1 arg2 ,,,) -> Returns the result of applying func to
+;; the supplied arguments
+;;
+;; (constraint 'type) -> Returns the type of the constraint, currently just
+;; basic and compound are supported
+;;
+;; (constraint 'force) -> Force an evaluation of the function, disregarding the
+;; cached value and dirty status of the node
+;;
+;; (constraint 'leaf?) -> Tests whether this is a leaf node, used by the solver
+;; to select nodes dependent on forms
 
 (define (dispatch-constraint type self args operands func hint-func)
   ;; Allows dispatch on suplied type

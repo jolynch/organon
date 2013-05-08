@@ -21,11 +21,15 @@
     (if (null? x-color)
       (make-binding-list
         (make-binding x (list 'color (car (get-value 'colors)))))
-      (make-binding-list
-        (random-choice
-          (map (lambda (color)
-             (make-binding y (list 'color color)))
-           (filter (lambda (z) (not (eq? z x-color))) (get-value 'colors))))))))
+      (cond
+        ((and (eq? x-color y-color) (> (random 5) 2))
+         (make-binding-list))
+        (else
+          (make-binding-list
+            (random-choice
+              (map (lambda (color)
+                     (make-binding y (list 'color color)))
+                   (filter (lambda (z) (not (eq? z x-color))) (get-value 'colors))))))))))
 
 
 ;;
@@ -34,29 +38,13 @@
 ;;  | C -- D
 ;;  |/
 ;;  B
-(define AB
-  (make-basic-constraint
-    '(A B)
-    Node-constraint
-    Node-hint))
+(define AB (make-basic-constraint '(A B) Node-constraint Node-hint))
 
-(define AC
-  (make-basic-constraint
-    '(A C)
-    Node-constraint
-    Node-hint))
+(define AC (make-basic-constraint '(A C) Node-constraint Node-hint))
 
-(define BC
-  (make-basic-constraint
-    '(B C)
-    Node-constraint
-    Node-hint))
+(define BC (make-basic-constraint '(B C) Node-constraint Node-hint))
 
-(define CD
-  (make-basic-constraint
-    '(C D)
-    Node-constraint
-    Node-hint))
+(define CD (make-basic-constraint '(C D) Node-constraint Node-hint))
 
 (define all-colored
   (make-compound-constraint
