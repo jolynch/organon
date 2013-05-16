@@ -16,11 +16,17 @@
 (declare-form 'I 'node)
 (declare-form 'J 'node)
 
+;; Neighboring Nodes must be colored differently
 (define (Node-constraint x y)
   (if (not (eq? (get-property x 'color) (get-property y 'color)))
     1.0
     0.0))
 
+;; If two nodes are different colors, with high probability stay the same
+;; otherwise switch one of them to another viable coloring
+;;
+;; If two nodes are the same color, change one of them to be a different
+;; color
 (define (Node-hint x y)
   (let ((x-color (get-property x 'color))
         (y-color (get-property y 'color)))
@@ -28,9 +34,11 @@
       (make-binding-list
         (make-binding x (list 'color (car (get-value 'colors)))))
       (cond
+        ;; Different colors already? with high probability hint at nothing
         ((and (eq? x-color y-color) (> (random 5) 2))
          (make-binding-list))
         (else
+          ;; Hint at a randomly chosen alternative for y
           (make-binding-list
             (random-choice
               (map (lambda (color)
@@ -38,15 +46,21 @@
                    (filter (lambda (z) (not (eq? z x-color))) (get-value 'colors))))))))))
 
 ;;
-;;Peterson graph, uh, this is hard to do in ascii art
+;; Peterson graph, uh, this is hard to do in ascii art
 ;;           A 
-;;       /   |  \
-;;     /     F    \
-;;    B--G all H-- E
-;;    \            /
-;;     \   I  J   /
-;;      \ /    \ /
-;;       C-----D
+;;         / | \
+;;       /   F   \
+;;     /     *     \
+;;    B--G ***** H--E
+;;    \     ***     /
+;;     \   I   J   /
+;;      \ /     \ /
+;;       C-------D
+;;
+;;   The *** section really isn't fully connected, see 
+;;   http://goo.gl/6R0hm
+;;
+;;   for a better idea of what it looks like
 
 (define AB (make-basic-constraint '(A B) Node-constraint Node-hint))
 (define BC (make-basic-constraint '(B C) Node-constraint Node-hint))

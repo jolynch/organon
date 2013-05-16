@@ -122,9 +122,3 @@
     (for-each (lambda (operand) (register-function me operand)) operands))
   me)
 
-
-;; Some tests
-
-;; (define x (make-basic-constraint '(foo bar) (lambda (f1 f2) (display f1)(display " ")(display f2))))
-
-

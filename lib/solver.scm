@@ -9,8 +9,6 @@
 ;; when a constraint fails is implementation/mode specific. Rely on constraint
 ;; propagation to actually propagate changes through the network.  Backtracking,
 ;; if needed, will occur at the constraint level.
-
-;; TODO: document me
 (define (iteratively-score-hints list-of-hints scoring-function visualizer-function)
   ;; forms-to-hints is an assoc list mapping a form to an list of hints
   (ppds "list-of-hints is ") (ppd list-of-hints)
@@ -69,6 +67,12 @@
       (pp accumulated-hint-scores)
   )))
 
+;;
+;; BEGIN ANNEALING SOLVER
+;;
+;;
+
+;; Choose hints to apply
 (define (anneal-choose hints iteration prob)
   (let ((chosen-hints
           (let loop ((result '())
@@ -80,19 +84,24 @@
                   (loop result (cdr remaining))))))))
     (better-bindings chosen-hints)))
 
-;; Takes bindings of the form
-;; (form property value) ...
+;; Takes bindings of the following form and applies them:
+;; ((form property value) ...)
 (define (apply-better-bindings chosen-bindings)
   (for-each
     (lambda (binding)
       (set-property (first binding) (second binding) (third binding)))
     chosen-bindings))
 
+;; PPrints the state so you can see what's going on
 (define (show-state forms)
   (for-each (lambda (form)
               (display "Form: ")(write form)(newline)
              (display "Bindings:")(pp-form form)) forms))
 
+
+;; The annealing solver, which tries to maximize the scoring function, cooling
+;; down over time and making fewer transitions.  If we hit iterations then we
+;; stop and return the best answer so far
 (define (annealing-solver o-forms objectives scoring temperature iterations)
   (let solve ((best-binding (map capture-bindings o-forms))
               (best-value (scoring))
@@ -108,7 +117,8 @@
                                            (better-bindings (list hint)))
                                          all-hints)))
            (all-bindings (remove-dups converted-hints)))
-      ;; generate the set of all possible subsets of hints, then compute their scores
+      ;; generate the set of all possible hints then apply them randomly
+      ;; based on the temperature
       (let ((chosen-bindings (anneal-choose all-hints 0 temp)))
         (apply-better-bindings chosen-bindings)
         (network-visualizer forms)
@@ -138,8 +148,7 @@
                        best-value
                        forms objective-constraints scoring-function (* .9999 temp) (- iter 1))))))))))
 
-
-
+;; Scoring functions
 (define (simple-scoring-func objective-constraints objective-constraint-weights )
   (lambda () 
     (let* ( (scores (map (lambda (x) (x)) objective-constraints))

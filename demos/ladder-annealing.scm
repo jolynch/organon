@@ -1,4 +1,4 @@
-(define *use-network-visualizer* #t)
+(define *use-network-visualizer* #f)
 (define *demo-debug* #t)
 (define *debug* #f)
 

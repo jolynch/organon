@@ -1,6 +1,6 @@
 (define *demo-debug* #t)
 (define *debug* #f)
-(define *use-network-visualizer* #t)
+(define *use-network-visualizer* #f)
 
 (declare-form 'left-hand '3D-hand-form)
 (declare-form 'right-hand '3D-hand-form)

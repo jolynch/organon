@@ -1,17 +1,8 @@
+;; Make nodes a list if it's not a list
 (define (listify nodes)
   (cond
     ((list? nodes) nodes)
     (else (list nodes))))
-
-(define (pretty-print nodes)
-  (define (print node depth)
-    (display node)(write-string " ")(display depth)(newline)
-    (for-each
-      (lambda (node)
-        (print node (+ 1 depth)))
-      '()))
-  (for-each (lambda (node) (print node 0)) nodes))
-
 
 ;; subsets based on http://pages.cs.wisc.edu/~fischer/cs538.s08/lectures/Lecture13.4up.pdf
 (define (subset-extend L E)
@@ -34,10 +25,13 @@
   (if (not (expression)) (error (string-append "assertion failed for expression: " expression))))
 
 
-;; Bindings are of the form:
-;; ((property . value) (property . value) ...)
+;; Binding convenience methods so that we don't have to constantly do list
+;; constructions in the hint functions
 ;;
-;; Binding lists are of the form
+;; Bindings are of the form:
+;; ((property . binding-value) (property . binding-value) ...)
+;;
+;; Binding-values are of the form
 ;; ((form . binding) (form . binding) ...
 ;;
 
@@ -83,7 +77,7 @@
                     (map (lambda (var) (cons (binding-form binding) var))
                          (cadr binding))) bindings))))
 
-;; Says if a particular form, property  is present in a given list of triples
+;; Says if a particular form, property tuple is present in a given list of triples
 (define (fp-present? lst form property)
   (if (null? lst) #f
     (let ((item (car lst)))
@@ -101,6 +95,7 @@
           (accum result (cdr remaining))
           (accum (cons value result) (cdr remaining)))))))
 
+;; Remove duplicates in general
 (define (remove-dups lst)
   (let accum ((result '())
               (remaining lst))
@@ -109,7 +104,6 @@
         (if (member value result)
           (accum result (cdr remaining))
           (accum (cons value result) (cdr remaining)))))))
-
 
 ;; Take a random choice from a list
 (define (random-choice lst)

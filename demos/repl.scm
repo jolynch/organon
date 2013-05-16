@@ -1,3 +1,6 @@
+;; A primitive REPL that allows us to quickly run our demos, is loaded
+;; automatically and you can select your demo appropriately
+
 (define demos
   (list
     (cons 'ladder "ladder.scm")

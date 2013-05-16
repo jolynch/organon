@@ -4,7 +4,6 @@
 (declare-form 'colors 'basic)
 (set-property 'colors 'value '(red blue green))
 
-
 (declare-form 'A 'node)
 (declare-form 'B 'node)
 (declare-form 'C 'node)
@@ -32,18 +31,17 @@
                    (filter (lambda (z) (not (eq? z x-color))) (get-value 'colors))))))))))
 
 
-;;
+;; Graph of the form
 ;;  A
 ;;  |\
 ;;  | C -- D
 ;;  |/
 ;;  B
+;;
+;;  Need to define a constraint for each pair of nodes
 (define AB (make-basic-constraint '(A B) Node-constraint Node-hint))
-
 (define AC (make-basic-constraint '(A C) Node-constraint Node-hint))
-
 (define BC (make-basic-constraint '(B C) Node-constraint Node-hint))
-
 (define CD (make-basic-constraint '(C D) Node-constraint Node-hint))
 
 (define all-colored
