@@ -173,7 +173,7 @@ The exhaustive solver is exponential in complexity. For the set of bindings give
 The second solver is an ``annealing'' solver. This solver takes the set of all hints and then randomly chooses a subset of those hints to apply. The interface to the annealing solver is identical, with an added parameter for the number of iterations to perform. Each iteration is $O(h \cdot log(n))$ in typical complexity and $O(h \cdot n)$ in worst case complexity, where h is the number of hints generated and n is the size of the constraint graph.   The intuition behind this solver is that there is no way to know which combination of hints lead to a solution state, but the hints recompute every iteration, so we can always escape from wrong choices later by taking a different set of hints.  The annealing comes from decreasing this probability with time, which guarantees that after a certain amount of time we will settle at some state, even if that state is not globally optimal.  
 
 The annealing solver does not provably find a solution state, it instead relies on the hint functions to return good hints that move the state of the system quickly towards a solution.  It is important to note that the hints are local as generally there is no knowledge of global state accessible to constraints.  While this may make many computer scientists and mathematicians nervous because we cannot guarantee or prove much, in the real world this solver is often sufficient to find goal states and does so very quickly.  In particular, this solver is useful because while it may not return a globally optimal solution, it does return a locally optimal solution, and those tend to be sufficient.  For example, we implemented graph coloring with the annealing solver and while it can theoretically not find a solution, it usually quickly finds a decent solution and in all cases we tested it on, it found a correct coloring.
-
+\newline
 \section{Example Uses of Organon}
 
 As the purpose of Organon was to provide a general framework to reason about constraints, we present four demonstrations of its capabilities in three different problem domains: engineering, economics, and mathematics.
@@ -275,7 +275,7 @@ This demo (\texttt{hard-coloring.scm}) defines node forms with a color and const
 \begin{figure}[H]
 \caption{Peterson Graph with Valid 3-Coloring}
 \centering
-\includegraphics[scale=.5]{peterson.png}
+\includegraphics[scale=.35]{peterson.png}
 \label{fig:Peterson}
 \end{figure}
 
